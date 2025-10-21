@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HTML Projects Library</title>
+  <meta name="description" content="A curated set of standalone HTML + CSS + JavaScript mini‑projects to download, customize, and remix." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #121823;
+      --ink: #e7ecf3;
+      --ink-dim: #b8c2cf;
+      --accent: #6ee7ff;
+      --accent-2: #9ae6b4;
+      --ring: rgba(110,231,255,.35);
+      --muted: #1a2230;
+      --card: #121826;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(110,231,255,.15), transparent 60%), linear-gradient(180deg, var(--bg), #0a0d12);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+    header.hero {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    header.hero h1 {
+      font-size: clamp(1.8rem, 1.3rem + 2vw, 3rem);
+      line-height: 1.1;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    header.hero p { margin: 0; color: var(--ink-dim); }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin: 22px 0 28px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .input {
+      position: relative;
+      flex: 1 1 320px;
+    }
+    .input input {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid #222b3a;
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 12px 14px 12px 44px;
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+    }
+    .input input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 6px var(--ring);
+    }
+    .input svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      opacity: .8;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--card), #0f1623);
+      border: 1px solid #1a2233;
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #2a3650;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25);
+    }
+    .card-header {
+      display: grid;
+      gap: 6px;
+    }
+    .card-header h3 {
+      margin: 0; font-size: 1.05rem; letter-spacing: -.01em;
+    }
+    .path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: var(--ink-dim);
+      background: var(--muted);
+      border: 1px solid #222b3b;
+      border-radius: 8px;
+      padding: 2px 6px;
+      width: fit-content;
+    }
+    .blurb { color: var(--ink-dim); min-height: 42px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      appearance: none;
+      border: 1px solid #253145;
+      background: #101726;
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 8px 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: .95rem;
+      transition: background .15s, border-color .15s, transform .05s;
+    }
+    .btn:hover { border-color: #334767; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(180deg, #1a2438, #0e172a);
+      border-color: #345;
+    }
+    footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid #1a2233;
+      color: var(--ink-dim);
+      font-size: .95rem;
+    }
+    .kbd { background: #222b3a; border: 1px solid #2d3950; border-radius: 6px; padding: 2px 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>HTML Projects Library</h1>
+      <p>Standalone HTML + CSS + JavaScript projects you can download and remix. Use the search to filter by name or description.</p>
+    </header>
+
+    <div class="toolbar">
+      <div class="input">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <input id="search" type="search" placeholder="Search projects..." autocomplete="off" />
+      </div>
+      <div class="hint">Tip: press <span class="kbd">/</span> to focus search</div>
+    </div>
+
+    <section id="grid" class="grid">
+      
+    <article class="card" data-name="html-projects cozy pixel city —">
+      <header class="card-header">
+        <h3>Cozy Pixel City</h3>
+        <code class="path">HTML-Projects</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="city-builder.html">Open Demo</a>
+        <a class="btn" href="city-builder.html">View Folder</a>
+      </div>
+    </article>
+    
+    
+
+    <article class="card" data-name="html-projects/demos kindle cookbook formatter kindle cookbook formatter">
+      <header class="card-header">
+        <h3>Kindle Cookbook Formatter</h3>
+        <code class="path">HTML-Projects/demos</code>
+      </header>
+      <p class="blurb">Kindle Cookbook Formatter</p>
+      <div class="actions">
+        <a class="btn primary" href="demos/cookbook-formatter.html">Open Demo</a>
+        <a class="btn" href="demos/cookbook-formatter.html">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/dictionary.html dictionary.html —">
+      <header class="card-header">
+        <h3>dictionary.html</h3>
+        <code class="path">HTML-Projects/dictionary.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="dictionary.html">Open Demo</a>
+        <a class="btn" href="dictionary.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/empty-tag-generator.html merged tag generator —">
+      <header class="card-header">
+        <h3>Empty HTML Tag Generator</h3>
+        <code class="path">HTML-Projects/empty-tag-generator.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="empty-tag-generator.html">Open Demo</a>
+        <a class="btn" href="empty-tag-generator.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/goal-tracker.html goal progress tracker goal progress tracker">
+      <header class="card-header">
+        <h3>Goal Progress Tracker</h3>
+        <code class="path">HTML-Projects/goal-tracker.html</code>
+      </header>
+      <p class="blurb">Goal Progress Tracker</p>
+      <div class="actions">
+        <a class="btn primary" href="goal-tracker.html">Open Demo</a>
+        <a class="btn" href="goal-tracker.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/html5-quiz.html html5 tags quiz html5 element quiz">
+      <header class="card-header">
+        <h3>Html5 Tags Quiz</h3>
+        <code class="path">HTML-Projects/html5-quiz.html</code>
+      </header>
+      <p class="blurb">HTML5 ELEMENT QUIZ</p>
+      <div class="actions">
+        <a class="btn primary" href="html5-quiz.html">Open Demo</a>
+        <a class="btn" href="html5-quiz.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/list-maker.html simple shopping list app list generator">
+      <header class="card-header">
+        <h3>List Maker</h3>
+        <code class="path">HTML-Projects/list-maker.html</code>
+      </header>
+      <p class="blurb">LIST GENERATOR</p>
+      <div class="actions">
+        <a class="btn primary" href="list-maker.html">Open Demo</a>
+        <a class="btn" href="list-maker.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/movie-search.html movie info movie information">
+      <header class="card-header">
+        <h3>Movie Search</h3>
+        <code class="path">HTML-Projects/movie-search.html</code>
+      </header>
+      <p class="blurb">Movie Information</p>
+      <div class="actions">
+        <a class="btn primary" href="movie-search.html">Open Demo</a>
+        <a class="btn" href="movie-search.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/notes.html notes.html —">
+      <header class="card-header">
+        <h3>Save Notes</h3>
+        <code class="path">HTML-Projects/notes.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="notes.html">Open Demo</a>
+        <a class="btn" href="notes.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/philosophy-quiz.html which philosophical movements align with you? which philosophical movements align with you?">
+      <header class="card-header">
+        <h3>Which Philosophical Movements Align With You?</h3>
+        <code class="path">HTML-Projects/philosophy-quiz.html</code>
+      </header>
+      <p class="blurb">Which Philosophical Movements Align With You?</p>
+      <div class="actions">
+        <a class="btn primary" href="philosophy-quiz.html">Open Demo</a>
+        <a class="btn" href="philosophy-quiz.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/pixel-art-draw.html pixel art drawing app pixel art drawing app">
+      <header class="card-header">
+        <h3>Draw Pixel Art</h3>
+        <code class="path">HTML-Projects/pixel-art-draw.html</code>
+      </header>
+      <p class="blurb">Pixel Art Drawing App</p>
+      <div class="actions">
+        <a class="btn primary" href="pixel-art-draw.html">Open Demo</a>
+        <a class="btn" href="pixel-art-draw.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/poetry-grid poetry grid helper —">
+      <header class="card-header">
+        <h3>Poetry Grid Helper</h3>
+        <code class="path">HTML-Projects/poetry-grid</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="poetry-grid/index.html">Open Demo</a>
+        <a class="btn" href="poetry-grid/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/qr-codes.html qr-codes.html —">
+      <header class="card-header">
+        <h3>URL to QR Code</h3>
+        <code class="path">HTML-Projects/qr-codes.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="qr-codes.html">Open Demo</a>
+        <a class="btn" href="qr-codes.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/quote-image-generator.html quote graphic generator —">
+      <header class="card-header">
+        <h3>Quote Graphic Generator</h3>
+        <code class="path">HTML-Projects/quote-image-generator.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="quote-image-generator.html">Open Demo</a>
+        <a class="btn" href="quote-image-generator.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/random-palette.html random color palette generator random color palette generator">
+      <header class="card-header">
+        <h3>Random Color Palette</h3>
+        <code class="path">HTML-Projects/random-palette.html</code>
+      </header>
+      <p class="blurb">Random Color Palette Generator</p>
+      <div class="actions">
+        <a class="btn primary" href="random-palette.html">Open Demo</a>
+        <a class="btn" href="random-palette.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/rhymes.html rhyme finder · datamuse api —">
+      <header class="card-header">
+        <h3>Rhyme Finder</h3>
+        <code class="path">HTML-Projects/rhymes.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="rhymes.html">Open Demo</a>
+        <a class="btn" href="rhymes.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/sms-templates.html sms templates —">
+      <header class="card-header">
+        <h3>SMS Templates</h3>
+        <code class="path">HTML-Projects/sms-templates.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="sms-templates.html">Open Demo</a>
+        <a class="btn" href="sms-templates.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/table-generator.html editable table generator —">
+      <header class="card-header">
+        <h3>Editable Table Generator</h3>
+        <code class="path">HTML-Projects/table-generator.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="table-generator.html">Open Demo</a>
+        <a class="btn" href="table-generator.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/thesaurus.html thesaurus.html —">
+      <header class="card-header">
+        <h3>Thesaurus</h3>
+        <code class="path">HTML-Projects/thesaurus.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="thesaurus.html">Open Demo</a>
+        <a class="btn" href="thesaurus.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/voice-record.html voice memo recorder —">
+      <header class="card-header">
+        <h3>Voice Recorder</h3>
+        <code class="path">HTML-Projects/voice-record.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="voice-record.html">Open Demo</a>
+        <a class="btn" href="voice-record.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    <article class="card" data-name="html-projects/wiki write your own wikipedia page —">
+      <header class="card-header">
+        <h3>Wikipedia Editor</h3>
+        <code class="path">HTML-Projects/wiki</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="wiki/personal-wikipedia.html">Open Demo</a>
+        <a class="btn" href="wiki/">View Folder</a>
+      </div>
+    </article>
+    
+    
+
+    <article class="card" data-name="html-projects/demos/dictionary.html dictionary.html —">
+      <header class="card-header">
+        <h3>Dictionary</h3>
+        <code class="path">HTML-Projects/demos/dictionary.html</code>
+      </header>
+      <p class="blurb">—</p>
+      <div class="actions">
+        <a class="btn primary" href="demos/dictionary.html">Open Demo</a>
+        <a class="btn" href="demos/dictionary.html/">View Folder</a>
+      </div>
+    </article>
+    
+
+    
+    
+    </section>
+
+    <footer>
+      <p>MIT Licensed. Built by Ashly. To add a new project, see <a href="./CONTRIBUTING.md">Contributing</a>.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Quick search / filter
+    const input = document.getElementById('search');
+    const grid = document.getElementById('grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    function filter() {
+      const q = (input.value || '').trim().toLowerCase();
+      for (const card of cards) {
+        const hay = card.getAttribute('data-name') || '';
+        card.style.display = hay.includes(q) ? '' : 'none';
+      }
+    }
+    input.addEventListener('input', filter);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== input) {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+    });
+  </script>
+</body>
+</html>
