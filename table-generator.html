@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editable Table Generator</title>
+  <style>
+   @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+    body {
+ font-family: "Oswald", serif;
+      margin: 20px;
+    }
+    #table-container {
+      margin-top: 20px;
+    }
+    .grid-table {
+      display: grid;
+      border: 1px solid #dcdcdc; /* 1px solid border for the table */
+    }
+    .grid-table div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid #dcdcdc; /* 1px solid border for each cell */
+    }
+    .editable {
+      cursor: pointer;
+    }
+    .grid-table .header-cell {
+      font-weight: bold;
+      background-color: #dcdcdc; /* First row background color */
+    }
+	
+	
+	label {
+	font-family:"Lobster", serif;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+	font-family: "Lobster", serif;
+  margin-top: 10px;
+  width: 100%;
+  background: #007bff; /* Blue button */
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #0056b3; /* Darker blue on hover */
+}
+
+
+#delete-btn {width:150px;height:auto;float:left;padding:3px;font-family: "Lobster", serif;}
+#save-btn {width:150px;float:left;padding:3px;height:auto;font-family: "Lobster", serif;}
+#search {width:auto;height:auto;float:left;padding:3px;font-family: "Lobster", serif;}
+
+	#generate {width:150px;float:left;padding:3px;height:auto;font-family: "Lobster", serif;}
+	#save {width:150px;float:right;padding:3px;height:auto;font-family: "Lobster", serif;}
+	
+	#generate-btn {width:150px;float:left;padding:3px;height:auto;font-family: "Lobster", serif;}
+	#download-btn {width:150px;float:right;padding:3px;height:auto;font-family: "Lobster", serif;}
+  </style>
+  
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+</style>
+
+</head>
+<body>
+  <h2>Editable Table Generator</h2>
+  <form id="tableForm">
+    <label for="columns">Number of Columns:</label>
+    <input type="number" id="columns" min="1" value="3" required><br><br>
+
+    <label for="rows">Number of Rows:</label>
+    <input type="number" id="rows" min="1" value="10" required><br><br>
+
+    <label for="headings">Column Headings (comma-separated):</label>
+    <input type="text" id="headings" value="Column 1, Column 2, Column 3"><br><br>
+
+    <button type="button" id="generateTable">Generate Table</button>
+  </form>
+
+  <div id="table-container"></div>
+
+  <script>
+    document.getElementById('generateTable').addEventListener('click', () => {
+      const columns = parseInt(document.getElementById('columns').value, 10);
+      const rows = parseInt(document.getElementById('rows').value, 10);
+      const headings = document.getElementById('headings').value.split(',');
+
+      const tableContainer = document.getElementById('table-container');
+      tableContainer.innerHTML = ''; // Clear the container before generating a new table
+
+      // Create table wrapper
+      const table = document.createElement('div');
+      table.className = 'grid-table';
+      table.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+      // Add headings as the first row
+      headings.forEach((heading, index) => {
+        if (index < columns) {
+          const cell = document.createElement('div');
+          cell.textContent = heading.trim(); // Heading text
+          styleCell(cell, 0); // Apply styling for header
+          cell.classList.add('header-cell');
+          table.appendChild(cell);
+        }
+      });
+
+      // Fill remaining cells with empty content
+      for (let r = 1; r < rows + 1; r++) {
+        for (let c = 0; c < columns; c++) {
+          const cell = document.createElement('div');
+          cell.textContent = ''; // Empty cell
+          styleCell(cell, r); // Apply styling for regular cells
+          makeEditable(cell);
+          table.appendChild(cell);
+        }
+      }
+
+      tableContainer.appendChild(table);
+
+      // Function to style cells
+      function styleCell(cell, row) {
+        cell.style.padding = '5px'; // Apply 5px padding
+        // Set background color for the first row (headings) and the rest (white)
+        cell.style.backgroundColor = row === 0 ? '#dcdcdc' : 'white';
+      }
+
+      // Make the cell editable
+      function makeEditable(cell) {
+        cell.classList.add('editable');
+        cell.contentEditable = true;
+        cell.addEventListener('click', () => {
+          cell.focus(); // Focus the cell when clicked
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+

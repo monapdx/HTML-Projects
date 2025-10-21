@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Which Philosophical Movements Align With You?</title>
+<style>
+  :root{
+    --bg:#0b0d12; --card:#131823; --muted:#9aa4b2; --text:#e9edf3; --accent:#7aa2ff; --accent2:#9f7aff; --ok:#58d68d; --warn:#ffb74d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--text); background:radial-gradient(1200px 600px at 20% -10%, #1b2340 0%, #0b0d12 60%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px;
+  }
+  .wrap{max-width:960px; width:100%}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px; padding:26px 26px 18px; box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+  }
+  h1{margin:0 0 8px; font-size:26px; letter-spacing:.2px}
+  .sub{color:var(--muted); margin-bottom:18px}
+  .progress{
+    height:8px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; margin:10px 0 20px;
+  }
+  .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2))}
+  .q{
+    display:none; animation:fade .25s ease;
+  }
+  .q.active{display:block}
+  .q h2{margin:0 0 12px; font-size:20px}
+  .opt{display:block; padding:12px 14px; border:1px solid rgba(255,255,255,0.14); border-radius:12px; margin:10px 0;
+       cursor:pointer; background:rgba(255,255,255,0.02)}
+  .opt input{margin-right:10px; accent-color:var(--accent)}
+  .nav{display:flex; gap:10px; margin-top:16px; justify-content:space-between}
+  button{
+    appearance:none; border:0; border-radius:12px; padding:10px 14px; font-weight:600; cursor:pointer;
+    background:linear-gradient(90deg, var(--accent), var(--accent2)); color:white;
+    box-shadow:0 6px 18px rgba(122,162,255,.3);
+  }
+  button.secondary{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.18); box-shadow:none}
+  .hint{color:var(--muted); font-size:14px; margin-top:6px}
+  .err{color:#ff8080; font-size:14px; display:none}
+  .results{display:none}
+  table{width:100%; border-collapse:collapse; margin:16px 0 4px}
+  th,td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:left}
+  th{color:var(--muted); font-weight:600}
+  .tag{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12)}
+  .pill{display:inline-block; padding:4px 8px; border-radius:8px; background:rgba(88,214,141,0.15); border:1px solid rgba(88,214,141,0.3); color:#bff3d2; font-size:12px}
+  .desc{color:var(--muted)}
+  canvas{width:100%; height:320px; background:rgba(255,255,255,0.03); border-radius:12px; margin-top:10px}
+  .topline{display:flex; align-items:center; gap:10px; justify-content:space-between; margin-top:6px}
+  .small{font-size:13px; color:var(--muted)}
+  .share{display:flex; gap:8px; flex-wrap:wrap}
+  @keyframes fade{from{opacity:.4; transform:translateY(4px)} to{opacity:1; transform:none}}
+  @media (max-width:600px){ .opt{font-size:15px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="app" aria-live="polite">
+    <h1>Which Philosophical Movements Align With You?</h1>
+    <div class="sub">Answer instinctively. At the end, we’ll compute your alignment across several movements and show a chart.</div>
+
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="bar" id="bar"></div>
+    </div>
+
+    <!-- QUESTIONS -->
+    <form id="quiz" novalidate>
+      <!-- We’ll inject questions via JS for clarity and to keep IDs aligned -->
+    </form>
+
+    <!-- RESULTS -->
+    <section class="results" id="results">
+      <h2 style="margin:8px 0 4px">Your Philosophical Alignment</h2>
+      <div class="topline">
+        <div class="small">Top 3 highlighted • Click column headers to sort</div>
+        <div class="share">
+          <button class="secondary" id="restartBtn" type="button">Retake Quiz</button>
+          <button class="secondary" id="copyBtn" type="button" title="Copy a compact summary to clipboard">Copy Summary</button>
+        </div>
+      </div>
+      <table id="tbl">
+        <thead><tr>
+          <th data-sort="name">Philosophy</th>
+          <th data-sort="score">Score</th>
+          <th>Why this fits</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <canvas id="chart" width="900" height="320" aria-label="Bar chart of philosophy alignment" role="img"></canvas>
+      <p class="desc" id="explain"></p>
+    </section>
+
+    <p class="hint" id="footHint">Use ↑/↓ to move choices. Press Enter to continue.</p>
+  </div>
+</div>
+
+<script>
+/* ------------------------
+   DATA: QUESTIONS + OPTIONS
+   ------------------------ */
+const philosophies = [
+  "Existentialism","Absurdism","Postmodernism","Moral Constructivism",
+  "Nihilism","Utilitarianism","Stoicism","Deontology","Objectivism","Rationalism"
+];
+
+const descriptions = {
+  Existentialism: "Freedom, authenticity, responsibility; meaning is created, not given.",
+  Absurdism: "The universe is indifferent/absurd; live and create value anyway.",
+  Postmodernism: "Skepticism toward grand narratives; truth/power entwined; irony as lens.",
+  "Moral Constructivism": "Morality is made by humans (cultures/agents), not discovered.",
+  Nihilism: "No inherent purpose or moral truth; face the void without illusion.",
+  Utilitarianism: "Outcomes matter; maximize well-being and minimize harm overall.",
+  Stoicism: "Live according to nature/virtue; master responses to fate.",
+  Deontology: "Duties/rules define right action regardless of consequences.",
+  Objectivism: "Rational self-interest and objective reality values.",
+  Rationalism: "Reason/empiricism can access objective truths about reality."
+};
+
+/* The scoring map gives +points to targeted philosophies for each answer.
+   We derived these from the rubric we discussed earlier. */
+const scoreMap = {
+  1: { // Morality objective?
+    A: {Deontology:2, Stoicism:2, Rationalism:1},
+    B: {"Moral Constructivism":2, Postmodernism:2, Existentialism:1, Nihilism:1},
+    C: {Nihilism:2, Postmodernism:1, Existentialism:1},
+    D: {Nihilism:2, Absurdism:1, Postmodernism:1}
+  },
+  2: { // What matters most?
+    A: {Utilitarianism:2, Existentialism:1},
+    B: {Deontology:2},
+    C: {Stoicism:1, "Moral Constructivism":1, VirtueEthics:1}, // Virtue placeholder
+    D: {Existentialism:2},
+    E: {Postmodernism:2, Nihilism:1}
+  },
+  3: { // Free will?
+    A: {Existentialism:2},
+    B: {Nihilism:1, Stoicism:1},
+    C: {Existentialism:1, Stoicism:1},
+    D: {Postmodernism:1, Nihilism:1}
+  },
+  4: { // Trolley
+    A: {Utilitarianism:2, Existentialism:1},
+    B: {Deontology:2},
+    C: {Existentialism:1, "Moral Constructivism":1},
+    D: {Existentialism:1}
+  },
+  5: { // What is most real?
+    A: {Rationalism:1, Stoicism:1},
+    B: {Rationalism:1, Idealism:1},
+    C: {Postmodernism:1},
+    D: {Nihilism:2, Postmodernism:1}
+  },
+  6: { // Nature of self
+    A: {Stoicism:1, Rationalism:1},
+    B: {Postmodernism:1, "Moral Constructivism":1},
+    C: {Existentialism:1, Postmodernism:1},
+    D: {Idealism:1},
+    E: {Postmodernism:1, "Moral Constructivism":1}
+  },
+  7: { // Universe purpose?
+    A: {Stoicism:1, Idealism:1},
+    B: {Absurdism:2, Existentialism:1, Nihilism:1},
+    C: {Existentialism:2},
+    D: {Nihilism:2}
+  },
+  8: { // How arrive at truth?
+    A: {Rationalism:2},
+    B: {Rationalism:1, Stoicism:1},
+    C: {Idealism:1},
+    D: {Postmodernism:2},
+    E: {Postmodernism:2, Nihilism:1}
+  },
+  9: { // Skepticism
+    A: {Rationalism:1, Stoicism:1},
+    B: {Postmodernism:1, Nihilism:2},
+    C: {Existentialism:1},
+    D: {Postmodernism:1}
+  },
+  10:{ // Trust senses?
+    A: {Rationalism:1},
+    B: {Postmodernism:1, "Moral Constructivism":1},
+    C: {Postmodernism:1},
+    D: {Existentialism:1}
+  },
+  11:{ // Social structures?
+    A: {Stoicism:1, Deontology:1},
+    B: {Postmodernism:2, Nihilism:1},
+    C: {Postmodernism:1, "Moral Constructivism":1},
+    D: {Existentialism:1}
+  },
+  12:{ // Political/social instincts
+    A: {Utilitarianism:1, Stoicism:1},
+    B: {Existentialism:2, Anarchism:1},
+    C: {Objectivism:1, Stoicism:1},
+    D: {Postmodernism:1, Nihilism:1},
+    E: {Nihilism:1}
+  },
+  13:{ // Duty to help others?
+    A: {Utilitarianism:1, Existentialism:1, Deontology:1},
+    B: {Objectivism:1, Existentialism:1},
+    C: {Objectivism:1, Nihilism:1},
+    D: {Postmodernism:1}
+  },
+  14:{ // After death?
+    A: {Idealism:1, Stoicism:1},
+    B: {Existentialism:1, Nihilism:2},
+    C: {Idealism:1, Postmodernism:1},
+    D: {Existentialism:1}
+  },
+  15:{ // Meaning?
+    A: {Existentialism:2, Utilitarianism:1},
+    B: {Existentialism:2},
+    C: {Existentialism:1, Nihilism:0.5},
+    D: {Nihilism:2},
+    E: {Rationalism:1, Idealism:1}
+  },
+  16:{ // Suffering?
+    A: {Existentialism:1, Stoicism:1},
+    B: {"Moral Constructivism":1, Existentialism:0.5},
+    C: {Nihilism:1},
+    D: {Stoicism:1}
+  },
+  17:{ // Aesthetic vibe
+    A: {Stoicism:1, Rationalism:1},
+    B: {Absurdism:1},
+    C: {Idealism:1, Postmodernism:1},
+    D: {Existentialism:1},
+    E: {Postmodernism:2}
+  },
+  18:{ // Identity vibe
+    A: {Rationalism:1},
+    B: {Existentialism:1, Postmodernism:1},
+    C: {Idealism:1},
+    D: {Stoicism:1},
+    E: {Nihilism:1},
+    F: {Existentialism:1}
+  }
+};
+
+/* QUESTIONS text + options (A, B, C...) */
+const questions = [
+  {t:"Do moral truths exist independently of humans?", o:["Yes, objective and universal.","No, they’re constructed.","We can’t really know.","They don’t exist—just a tool or illusion."]},
+  {t:"When making moral decisions, what matters most?", o:["Consequences of the action.","Following moral rules or duties.","Character and intentions.","What feels authentic in the moment.","Alignment with instincts/power."]},
+  {t:"Do you believe in ‘free will’?", o:["Yes, I choose freely.","No, everything is determined.","We might not have it but must act as if we do.","There’s no self to have free will."]},
+  {t:"Would you save five people by killing one innocent person?", o:["Yes—save more lives.","No—killing is wrong regardless.","It depends entirely on context.","My feelings/aftermath matter more than math."]},
+  {t:"What is most real to you?", o:["The physical world we can measure.","Ideas/forms/consciousness.","Reality is mental or dreamlike.","Reality is unknowable / possibly meaningless."]},
+  {t:"What is the nature of the self?", o:["A real, persisting self.","A narrative/illusion by the brain.","No true self—just experience.","A divine/spiritual entity.","Defined by social & historical context."]},
+  {t:"Does the universe have a purpose?", o:["Yes, an ultimate design.","No—indifferent or absurd.","Only the purpose we give it.","I don’t know and don’t care."]},
+  {t:"How can we best arrive at truth?", o:["Reason and logic.","Scientific inquiry/observation.","Intuition or spiritual insight.","Language, culture, and history.","No single truth—just perspectives."]},
+  {t:"Your stance on skepticism?", o:["Healthy doubt, but knowledge is possible.","Doubt everything—even our minds.","Useful but ultimately paralyzing.","Truth is social; skepticism is overrated."]},
+  {t:"Do you trust your senses to reflect reality?", o:["Yes, mostly.","Somewhat; limited and often wrong.","No—perception is deceptive.","It doesn’t matter—they’re all we’ve got."]},
+  {t:"How do you view social structures (government, religion, economy)?", o:["Necessary for order and justice.","Often reinforce power; should be challenged.","Human inventions with no ultimate authority.","Useful tools but never absolute."]},
+  {t:"Which instinct resonates most?", o:["Harmony and collective good.","Individual freedom is paramount.","Hierarchies/strength drive progress.","Systems are corrupt—we need radical change.","Disillusioned with politics altogether."]},
+  {t:"Do people have a duty to help others?", o:["Yes, part of being moral/good.","Only if it doesn’t infringe on freedom.","No—people are responsible for themselves.","The question has no real answer."]},
+  {t:"What happens after death?", o:["Something—afterlife/reincarnation.","Nothing—death is the end.","Consciousness continues in unknown ways.","It doesn’t matter—focus on life." ]},
+  {t:"How do you find meaning?", o:["Connection, purpose, helping others.","Create it myself—meaning isn’t given.","Pleasure, experience, expression.","There is no meaning, and that’s freeing.","Understanding the universe/the divine."]},
+  {t:"Does suffering have meaning?", o:["Yes—can teach or transform.","Sometimes—depends on context.","No—random and brutal.","It’s just part of life, not good/bad."]},
+  {t:"Which resonates most (aesthetics)?", o:["Classical harmony, structure, balance.","Dark, absurd, or ironic expressions.","Abstract, mystical, symbolic.","Raw, emotional, unfiltered reality.","Sharp satire and cultural critique."]},
+  {t:"Which description sounds most like you?", o:["Seeker of truth.","Rebel/critic of systems.","Mystic/outsider.","Pragmatic realist.","Cynic with a heart.","Creator of my own philosophy."]}
+];
+
+/* ------------------------
+   RENDER QUESTIONS
+   ------------------------ */
+const quizEl = document.getElementById('quiz');
+const barEl  = document.getElementById('bar');
+const resultsEl = document.getElementById('results');
+const tblBody = document.querySelector('#tbl tbody');
+const chart = document.getElementById('chart');
+const explain = document.getElementById('explain');
+
+function renderQuiz(){
+  quizEl.innerHTML = "";
+  questions.forEach((q, idx)=>{
+    const sec = document.createElement('section');
+    sec.className = 'q' + (idx===0 ? ' active':'');
+    sec.dataset.index = idx;
+
+    const h2 = document.createElement('h2');
+    h2.textContent = `Q${idx+1}. ${q.t}`;
+    sec.appendChild(h2);
+
+    const err = document.createElement('div');
+    err.className = 'err';
+    err.textContent = 'Please choose an option to continue.';
+    sec.appendChild(err);
+
+    q.o.forEach((opt, i)=>{
+      const id = `q${idx}_opt${i}`;
+      const label = document.createElement('label');
+      label.className = 'opt';
+      label.setAttribute('for', id);
+      label.innerHTML = `<input type="radio" name="q${idx}" id="${id}" value="${String.fromCharCode(65+i)}" /> ${String.fromCharCode(65+i)}. ${opt}`;
+      sec.appendChild(label);
+    });
+
+    // nav
+    const nav = document.createElement('div');
+    nav.className = 'nav';
+    const back = document.createElement('button');
+    back.type='button'; back.className='secondary'; back.textContent='Back';
+    back.addEventListener('click', ()=>goto(idx-1));
+    const next = document.createElement('button');
+    next.type='button'; next.textContent = idx===questions.length-1 ? 'See Results' : 'Next';
+    next.addEventListener('click', ()=>{
+      const val = getValue(idx);
+      if(!val){ err.style.display='block'; return; }
+      err.style.display='none';
+      if(idx===questions.length-1){ computeResults(); }
+      else goto(idx+1);
+    });
+    nav.append(back, next);
+    sec.appendChild(nav);
+
+    quizEl.appendChild(sec);
+  });
+  updateProgress(0);
+}
+
+function getValue(i){
+  const sel = quizEl.querySelectorAll(`input[name="q${i}"]`);
+  for(const r of sel){ if(r.checked) return r.value; }
+  return null;
+}
+
+function goto(i){
+  const total = questions.length;
+  if(i<0) i=0; if(i>=total) i=total-1;
+  quizEl.querySelectorAll('.q').forEach(q=>q.classList.remove('active'));
+  quizEl.querySelector(`.q[data-index="${i}"]`).classList.add('active');
+  updateProgress(i);
+  // focus first radio for accessibility
+  const first = quizEl.querySelector(`.q[data-index="${i}"] input[type="radio"]`);
+  if(first) first.focus();
+}
+
+function updateProgress(idx){
+  const pct = Math.round(((idx)/questions.length)*100);
+  barEl.style.width = pct + '%';
+  barEl.parentElement.setAttribute('aria-valuenow', pct);
+}
+
+/* ------------------------
+   SCORING
+   ------------------------ */
+function emptyScores(){
+  const s={}; philosophies.forEach(p=>s[p]=0); return s;
+}
+
+function accumulate(scores, add){
+  for(const k in add){
+    if(!(k in scores)) continue; // ignore keys like Idealism/Anarchism/Virtue placeholder
+    scores[k]+=add[k];
+  }
+}
+
+function computeResults(){
+  // gather answers
+  const answers = [];
+  for(let i=0;i<questions.length;i++){
+    const v=getValue(i);
+    if(!v){ goto(i); return; }
+    answers.push(v);
+  }
+
+  // score
+  const scores = emptyScores();
+  answers.forEach((ans, idx)=>{
+    const m = scoreMap[idx+1]?.[ans];
+    if(m) accumulate(scores, m);
+  });
+
+  // normalize and sort
+  const maxPossible =  // rough scaling: compute maximum seen among philosophies to scale chart nicely
+    Math.max(...Object.values(scores));
+  const rows = Object.entries(scores)
+    .map(([name,score])=>({name, score: Number(score.toFixed(2))}))
+    .sort((a,b)=>b.score-a.score);
+
+  // render table
+  tblBody.innerHTML='';
+  const top3Names = rows.slice(0,3).map(r=>r.name);
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    const name = document.createElement('td');
+    name.innerHTML = `${r.name} ${top3Names.includes(r.name) ? ' <span class="pill">Top</span>' : ''}`;
+    const score = document.createElement('td'); score.textContent = r.score.toFixed(2);
+    const why = document.createElement('td');  why.className='desc'; why.textContent = descriptions[r.name] || '';
+    tr.append(name, score, why); tblBody.appendChild(tr);
+  });
+
+  // explanation paragraph
+  explain.textContent = `Top alignments: ${rows.slice(0,3).map(r=>r.name).join(', ')}. This is computed by mapping each answer to one or more schools (with weights), then summing across all 18 questions.`;
+
+  // chart
+  drawChart(rows, maxPossible);
+
+  // switch views
+  quizEl.style.display='none';
+  resultsEl.style.display='block';
+  barEl.style.width = '100%';
+  barEl.parentElement.setAttribute('aria-valuenow', 100);
+
+  // copy summary
+  document.getElementById('copyBtn').onclick = ()=>{
+    const summary = {
+      top3: rows.slice(0,3),
+      all: rows,
+      answers: answers
+    };
+    navigator.clipboard.writeText(JSON.stringify(summary, null, 2))
+      .then(()=> alert('Summary copied to clipboard!'))
+      .catch(()=> alert('Could not copy. Your browser may block clipboard access.'));
+  };
+}
+
+function drawChart(rows, max){
+  const ctx = chart.getContext('2d');
+  const W = chart.width, H = chart.height;
+  ctx.clearRect(0,0,W,H);
+
+  const padding = 36, rowH = (H - padding*2) / rows.length;
+  const barMaxW = W - 240; // leave room for labels
+
+  ctx.font = "14px system-ui";
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.fillText("Alignment Score (relative scale)", padding, padding - 10);
+
+  // grid
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.lineWidth = 1;
+  for(let i=0;i<=5;i++){
+    const x = padding + (barMaxW/5)*i + 150;
+    ctx.beginPath(); ctx.moveTo(x, padding-6); ctx.lineTo(x, H-padding+6); ctx.stroke();
+  }
+
+  const top3 = rows.slice(0,3).map(r=>r.name);
+
+  rows.forEach((r, i)=>{
+    const y = padding + i*rowH;
+    // label
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.textBaseline = "middle";
+    ctx.fillText(r.name, padding, y + rowH/2);
+
+    // bar
+    const scale = max > 0 ? (r.score / max) : 0;
+    const w = Math.max(4, scale * barMaxW);
+    const x = padding + 150;
+
+    // bar background
+    ctx.fillStyle = "rgba(255,255,255,0.07)";
+    ctx.fillRect(x, y + rowH*0.2, barMaxW, rowH*0.6);
+
+    // bar fg (use default color; no specific colors per instructions)
+    ctx.fillStyle = top3.includes(r.name) ? "rgba(122,162,255,0.9)" : "rgba(255,255,255,0.8)";
+    ctx.fillRect(x, y + rowH*0.2, w, rowH*0.6);
+
+    // value
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fillText(r.score.toFixed(2), x + w + 8, y + rowH/2);
+  });
+}
+
+/* sorting */
+document.querySelectorAll('#tbl thead th[data-sort]').forEach(th=>{
+  th.style.cursor='pointer';
+  let asc = false;
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.sort;
+    const rows = [...tblBody.querySelectorAll('tr')];
+    rows.sort((a,b)=>{
+      const get = (tr)=> key==='name' ? tr.children[0].textContent : parseFloat(tr.children[1].textContent);
+      const va = get(a), vb = get(b);
+      if(key==='name') return asc ? vb.localeCompare(va) : va.localeCompare(vb);
+      return asc ? vb - va : va - vb;
+    });
+    asc = !asc;
+    tblBody.innerHTML=''; rows.forEach(r=>tblBody.appendChild(r));
+  });
+});
+
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  // reset radios
+  quizEl.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+  resultsEl.style.display='none';
+  quizEl.style.display='block';
+  goto(0);
+});
+
+/* keyboard hint */
+document.addEventListener('keydown', (e)=>{
+  const active = document.querySelector('.q.active');
+  if(!active) return;
+  const radios = [...active.querySelectorAll('input[type="radio"]')];
+  const current = radios.findIndex(r=>r === document.activeElement);
+  if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){
+    e.preventDefault();
+    const i = current < 0 ? 0 : Math.min(radios.length-1, current+1);
+    radios[i].focus();
+  }else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){
+    e.preventDefault();
+    const i = current <= 0 ? 0 : current-1;
+    radios[i].focus();
+  }else if(e.key === 'Enter'){
+    e.preventDefault();
+    active.querySelector('.nav button:not(.secondary)').click();
+  }
+});
+
+/* init */
+renderQuiz();
+</script>
+</body>
+</html>

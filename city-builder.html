@@ -1,0 +1,747 @@
+# Recreate the Cozy Pixel City single-file HTML and save it for download
+html = r"""<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cozy Pixel City</title>
+    <!-- Tailwind (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-white to-sky-50">
+    <div id="root"></div>
+
+    <!-- React 18 + ReactDOM (UMD) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- Babel Standalone to transpile TSX/JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel" data-presets="react,typescript">
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      function CozyPixelCity() {
+        const TILE = 24;
+        const W = 32;
+        const H = 20;
+        const TICK_MS = 1000;
+
+        const PAL = useMemo(
+          () => ({
+            grass: "#b6e3a8",
+            grassDark: "#9dd08f",
+            soil: "#d7b594",
+            sand: "#f5e6ad",
+            water: "#a7d8f0",
+            waterDark: "#7fc4e3",
+            road: "#595959",
+            roadDark: "#3f3f3f",
+            white: "#fff7f7",
+            black: "#111",
+            shadow: "#00000020",
+            houseRoof: "#ff7e79",
+            houseWall: "#ffe6d6",
+            treeLeaf: "#6ed18f",
+            treeDark: "#51b873",
+            trunk: "#825a32",
+            farmCrop: "#9ad36c",
+            factory: "#b2b8c2",
+            smoke: "#b9c2cc",
+            turbine: "#cfd7df",
+            park: "#93e0ad",
+            outline: "#405b66",
+            ui: "#f5f7fb",
+            uiText: "#334155",
+            coin: "#f6c453",
+            red: "#ef4444",
+            green: "#16a34a",
+            blue: "#3b82f6",
+            pink: "#f472b6",
+          }),
+          []
+        );
+
+        // ---- Types (erased by Babel/TypeScript preset) ----
+        // type Ground = "grass" | "water" | "sand";
+        // type Content = null | "road" | "house" | "tree" | "farm" | "factory" | "wind" | "park";
+        // type Cell = { ground: Ground; content: Content; roadMask?: number; seed: number };
+
+        const blankCell = () => ({ ground: "grass", content: null, roadMask: 0, seed: Math.random() });
+        const makeGrid = () => Array.from({ length: H }, () => Array.from({ length: W }, blankCell));
+
+        const [grid, setGrid] = useState(() => {
+          const g = makeGrid();
+          for (let y = 8; y < 12; y++) for (let x = 4; x < 9; x++) g[y][x].ground = "water";
+          for (let x = 10; x < 22; x++) g[12][x].content = "road";
+          g[11][12].content = "house";
+          g[11][14].content = "house";
+          return g;
+        });
+
+        const [coins, setCoins] = useState(200);
+        const [pop, setPop] = useState(4);
+        const [power, setPower] = useState(0);
+        const [food, setFood] = useState(2);
+        const [happy, setHappy] = useState(70);
+
+        const TOOL_ORDER = [
+          "road",
+          "house",
+          "tree",
+          "farm",
+          "factory",
+          "wind",
+          "park",
+          "pond",
+          "grass",
+          "bulldoze",
+        ];
+
+        const TOOL_KEYS = { 1: "road", 2: "house", 3: "tree", 4: "farm", 5: "factory", 6: "wind", 7: "park", 8: "pond", 9: "grass", 0: "bulldoze" };
+
+        const tools = {
+          road: {
+            id: "road",
+            label: "Road",
+            cost: 1,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && g[y][x].content !== "road",
+            place: (x, y, g) => withRoadRecalc(mutate(g, x, y, (c) => ({ ...c, content: "road" }))),
+          },
+          house: {
+            id: "house",
+            label: "House",
+            cost: 10,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content && hasNeighbor(g, x, y, (t) => t.content === "road"),
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "house" })),
+          },
+          tree: {
+            id: "tree",
+            label: "Tree",
+            cost: 2,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content,
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "tree" })),
+          },
+          farm: {
+            id: "farm",
+            label: "Farm",
+            cost: 12,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content,
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "farm" })),
+          },
+          factory: {
+            id: "factory",
+            label: "Factory",
+            cost: 25,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content && hasNeighbor(g, x, y, (t) => t.content === "road"),
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "factory" })),
+          },
+          wind: {
+            id: "wind",
+            label: "Wind",
+            cost: 20,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content,
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "wind" })),
+          },
+          park: {
+            id: "park",
+            label: "Park",
+            cost: 8,
+            canPlace: (x, y, g) => g[y][x].ground !== "water" && !g[y][x].content,
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, content: "park" })),
+          },
+          pond: {
+            id: "pond",
+            label: "Pond",
+            cost: 0,
+            canPlace: () => true,
+            place: (x, y, g) => withRoadRecalc(mutate(g, x, y, (c) => ({ ...c, ground: "water", content: null }))),
+          },
+          grass: {
+            id: "grass",
+            label: "Grass",
+            cost: 0,
+            canPlace: () => true,
+            place: (x, y, g) => mutate(g, x, y, (c) => ({ ...c, ground: "grass" })),
+          },
+          bulldoze: {
+            id: "bulldoze",
+            label: "Bulldoze",
+            cost: 0,
+            canPlace: () => true,
+            place: (x, y, g) => withRoadRecalc(mutate(g, x, y, (c) => ({ ...c, content: null }))),
+          },
+        };
+
+        const [tool, setTool] = useState("road");
+
+        const undoRef = useRef([]);
+        const redoRef = useRef([]);
+        const pushUndo = (state) => {
+          undoRef.current.push(cloneGrid(state));
+          if (undoRef.current.length > 50) undoRef.current.shift();
+          redoRef.current = [];
+        };
+        const undo = () => {
+          const last = undoRef.current.pop();
+          if (!last) return;
+          redoRef.current.push(cloneGrid(grid));
+          setGrid(cloneGrid(last));
+        };
+        const redo = () => {
+          const last = redoRef.current.pop();
+          if (!last) return;
+          undoRef.current.push(cloneGrid(grid));
+          setGrid(cloneGrid(last));
+        };
+
+        const canvasRef = useRef(null);
+        const [waterPhase, setWaterPhase] = useState(0);
+
+        useEffect(() => {
+          let af;
+          const loop = () => {
+            setWaterPhase((p) => (p + 1) % 60);
+            af = requestAnimationFrame(loop);
+          };
+          af = requestAnimationFrame(loop);
+          return () => cancelAnimationFrame(af);
+        }, []);
+
+        useEffect(() => {
+          const cv = canvasRef.current;
+          if (!cv) return;
+          const ctx = cv.getContext("2d");
+          if (!ctx) return;
+          ctx.imageSmoothingEnabled = false;
+
+          ctx.fillStyle = PAL.ui;
+          ctx.fillRect(0, 0, cv.width, cv.height);
+
+          for (let y = 0; y < H; y++) {
+            for (let x = 0; x < W; x++) {
+              const cell = grid[y][x];
+              const px = x * TILE;
+              const py = y * TILE;
+              drawGround(ctx, px, py, cell, waterPhase, PAL, TILE);
+            }
+          }
+
+          for (let y = 0; y < H; y++) {
+            for (let x = 0; x < W; x++) {
+              const cell = grid[y][x];
+              const px = x * TILE;
+              const py = y * TILE;
+              drawContent(ctx, px, py, cell, grid, PAL, TILE, waterPhase);
+            }
+          }
+
+          ctx.strokeStyle = PAL.shadow;
+          ctx.lineWidth = 1;
+          for (let x = 0; x <= W; x++) {
+            ctx.beginPath();
+            ctx.moveTo(x * TILE + 0.5, 0);
+            ctx.lineTo(x * TILE + 0.5, H * TILE);
+            ctx.stroke();
+          }
+          for (let y = 0; y <= H; y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, y * TILE + 0.5);
+            ctx.lineTo(W * TILE, y * TILE + 0.5);
+            ctx.stroke();
+          }
+        }, [grid, PAL, TILE, waterPhase]);
+
+        const placingRef = useRef(false);
+
+        const tryPlaceAt = (gx, gy, useBulldozer = false) => {
+          if (gx < 0 || gy < 0 || gx >= W || gy >= H) return;
+          const t = useBulldozer ? tools["bulldoze"] : tools[tool];
+          const g = grid;
+          if (!t.canPlace(gx, gy, g)) return;
+          const cost = t.id === "bulldoze" ? 0 : t.cost;
+          if (coins < cost) return;
+          pushUndo(grid);
+          const next = t.place(gx, gy, g);
+          setGrid(next);
+          setCoins((c) => c - cost);
+        };
+
+        const onCanvasPointer = (e) => {
+          const rect = e.target.getBoundingClientRect();
+          const gx = Math.floor(((e.clientX - rect.left) / rect.width) * (W * TILE) / TILE);
+          const gy = Math.floor(((e.clientY - rect.top) / rect.height) * (H * TILE) / TILE);
+
+          const right = e.button === 2;
+          if (e.type === "mousedown") {
+            placingRef.current = true;
+            tryPlaceAt(gx, gy, right || tool === "bulldoze");
+          } else if (e.type === "mousemove") {
+            if (placingRef.current) tryPlaceAt(gx, gy, false);
+          } else if (e.type === "mouseup" || e.type === "mouseleave") {
+            placingRef.current = false;
+          }
+        };
+
+        const onContextMenu = (e) => e.preventDefault();
+
+        useEffect(() => {
+          const onKey = (e) => {
+            if (e.key.toLowerCase() === "z" && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              undo();
+              return;
+            }
+            if (e.key.toLowerCase() === "y" && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              redo();
+              return;
+            }
+            if (e.key.toLowerCase() === "s") {
+              e.preventDefault();
+              doSave();
+              return;
+            }
+            if (e.key.toLowerCase() === "l") {
+              e.preventDefault();
+              doLoad();
+              return;
+            }
+            if (e.key.toLowerCase() === "r") {
+              e.preventDefault();
+              if (confirm("Reset the city?")) doReset();
+              return;
+            }
+            const mapped = TOOL_KEYS[e.key];
+            if (mapped) setTool(mapped);
+          };
+          window.addEventListener("keydown", onKey);
+          return () => window.removeEventListener("keydown", onKey);
+        }, [grid, tool]);
+
+        useEffect(() => {
+          const id = setInterval(() => {
+            const stats = countStats(grid);
+
+            const wantPower = stats.houses * 1 + stats.factories * 1 + stats.farms * 0.5;
+            const havePower = stats.winds * 3;
+            const powerDelta = havePower - wantPower;
+
+            const wantFood = stats.population * 0.15;
+            const haveFood = stats.farms * 2;
+            const foodDelta = haveFood - wantFood;
+
+            const income = stats.factories * 2 + stats.population * 0.1 + stats.parks * 0.2;
+            const roadMaint = stats.roads * 0.02;
+
+            let h = happy;
+            if (powerDelta < 0) h -= 1; else h += 0.2;
+            if (foodDelta < 0) h -= 1; else h += 0.2;
+            h += stats.parks * 0.05;
+            h -= stats.factories * 0.05;
+            h = Math.max(0, Math.min(100, Math.round(h * 10) / 10));
+
+            setHappy(h);
+            setCoins((c) => Math.max(0, Math.round((c + income - roadMaint) * 100) / 100));
+            setPower((p) => Math.round((p + powerDelta) * 10) / 10);
+            setFood((f) => Math.round((f + foodDelta) * 10) / 10);
+            setPop(stats.population);
+          }, TICK_MS);
+          return () => clearInterval(id);
+        }, [grid, happy]);
+
+        const STORAGE_KEY = "cozy-pixel-city-v1";
+        const doSave = () => {
+          const payload = JSON.stringify({ grid, coins, pop, power, food, happy });
+          localStorage.setItem(STORAGE_KEY, payload);
+          toast("Saved!");
+        };
+        const doLoad = () => {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return toast("No save found yet.");
+          try {
+            const data = JSON.parse(raw);
+            setGrid(data.grid);
+            setCoins(data.coins);
+            setPop(data.pop);
+            setPower(data.power);
+            setFood(data.food);
+            setHappy(data.happy);
+            toast("Loaded.");
+          } catch (e) {
+            console.error(e);
+            toast("Could not load save.");
+          }
+        };
+        const doReset = () => {
+          setGrid(makeGrid());
+          setCoins(200);
+          setPop(0);
+          setPower(0);
+          setFood(0);
+          setHappy(70);
+          undoRef.current = [];
+          redoRef.current = [];
+          toast("Fresh start!");
+        };
+
+        return (
+          <div className="w-full h-full min-h-screen bg-gradient-to-b from-white to-sky-50 text-slate-800">
+            <div className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b border-slate-200">
+              <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏡</span>
+                  <h1 className="text-xl font-semibold tracking-tight">Cozy Pixel City</h1>
+                  <span className="text-xs ml-2 px-2 py-1 rounded-full bg-pink-100 text-pink-700">alpha</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <StatPill label="Coins" value={coins.toFixed(0)} accent={PAL.coin} emoji="🪙" />
+                  <StatPill label="Pop" value={pop.toFixed(0)} accent={PAL.green} emoji="👨‍👩‍👧" />
+                  <StatPill label="Power" value={power.toFixed(1)} accent={PAL.blue} emoji="⚡" />
+                  <StatPill label="Food" value={food.toFixed(1)} accent={PAL.green} emoji="🌽" />
+                  <StatPill label="Happy" value={`${happy.toFixed(0)}%`} accent={PAL.pink} emoji="😊" />
+                  <div className="hidden md:flex gap-2 ml-4">
+                    <button className="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[.98] transition" onClick={doSave}>Save (S)</button>
+                    <button className="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[.98] transition" onClick={doLoad}>Load (L)</button>
+                    <button className="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[.98] transition" onClick={() => (confirm("Reset city?") && doReset())}>Reset (R)</button>
+                    <button className="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[.98] transition" onClick={undo}>Undo (Ctrl/Cmd+Z)</button>
+                    <button className="text-sm px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:scale-[.98] transition" onClick={redo}>Redo (Ctrl/Cmd+Y)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto p-4 grid grid-cols-12 gap-4">
+              <aside className="col-span-12 lg:col-span-3">
+                <div className="rounded-2xl shadow-sm border bg-white p-3">
+                  <h2 className="text-sm font-semibold mb-2">Build Menu</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
+                    {TOOL_ORDER.map((id, i) => (
+                      <button
+                        key={id}
+                        className={
+                          "flex items-center gap-2 border rounded-xl px-2 py-2 hover:shadow-sm transition " +
+                          (tool === id ? "ring-2 ring-sky-400 border-sky-300" : "border-slate-200")
+                        }
+                        onClick={() => setTool(id)}
+                        title={"Hotkey " + (i < 9 ? i + 1 : 0)}
+                      >
+                        <span className="w-6 h-6 inline-block overflow-hidden rounded-sm border border-slate-200">
+                          <ToolPreview id={id} PAL={PAL} TILE={16} />
+                        </span>
+                        <span className="text-sm">{tools[id].label}</span>
+                        {tools[id].cost > 0 && (
+                          <span className="ml-auto text-xs text-slate-500">🪙{tools[id].cost}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-3 text-xs text-slate-500 leading-relaxed">
+                    <p>Left‑click to place. Right‑click to remove. Houses & factories must touch a road.</p>
+                    <p className="mt-1">Keys: 1‑9 to switch • S save • L load • R reset • Ctrl/Cmd+Z undo.</p>
+                  </div>
+                </div>
+              </aside>
+
+              <section className="col-span-12 lg:col-span-9">
+                <div className="rounded-2xl overflow-hidden shadow border bg-white p-3">
+                  <div className="relative max-w-full overflow-auto">
+                    <canvas
+                      ref={canvasRef}
+                      width={W * TILE}
+                      height={H * TILE}
+                      className="block mx-auto border rounded-lg"
+                      onMouseDown={onCanvasPointer}
+                      onMouseMove={onCanvasPointer}
+                      onMouseUp={onCanvasPointer}
+                      onMouseLeave={onCanvasPointer}
+                      onContextMenu={onContextMenu}
+                    />
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+              <Toast />
+            </div>
+          </div>
+        );
+
+        function hasNeighbor(g, x, y, pred) {
+          return (
+            (y > 0 && pred(g[y - 1][x])) ||
+            (x < W - 1 && pred(g[y][x + 1])) ||
+            (y < H - 1 && pred(g[y + 1][x])) ||
+            (x > 0 && pred(g[y][x - 1]))
+          );
+        }
+        function mutate(g, x, y, f) {
+          const copy = g.map((row) => row.slice());
+          copy[y][x] = f(copy[y][x]);
+          return copy;
+        }
+        function withRoadRecalc(g) {
+          const maskAt = (x, y) => {
+            const isRoad = (xx, yy) => (g[yy]?.[xx]?.content === "road");
+            let m = 0;
+            if (isRoad(x, y - 1)) m |= 1;
+            if (isRoad(x + 1, y)) m |= 2;
+            if (isRoad(x, y + 1)) m |= 4;
+            if (isRoad(x - 1, y)) m |= 8;
+            return m;
+          };
+          return g.map((row, y) =>
+            row.map((c, x) => (c.content === "road" ? { ...c, roadMask: maskAt(x, y) } : c))
+          );
+        }
+        function cloneGrid(g) {
+          return g.map((row) => row.map((c) => ({ ...c })));
+        }
+        function countStats(g) {
+          let houses = 0, trees = 0, farms = 0, factories = 0, winds = 0, parks = 0, roads = 0;
+          for (let y = 0; y < H; y++) {
+            for (let x = 0; x < W; x++) {
+              const c = g[y][x];
+              if (c.content === "house") houses++;
+              if (c.content === "tree") trees++;
+              if (c.content === "farm") farms++;
+              if (c.content === "factory") factories++;
+              if (c.content === "wind") winds++;
+              if (c.content === "park") parks++;
+              if (c.content === "road") roads++;
+            }
+          }
+          const population = houses * 2 + Math.floor(parks * 0.2);
+          return { houses, trees, farms, factories, winds, parks, roads, population };
+        }
+      }
+
+      function drawGround(ctx, px, py, cell, waterPhase, PAL, TILE) {
+        if (cell.ground === "grass") {
+          fillRect(ctx, px, py, TILE, TILE, PAL.grass);
+          dither(ctx, px, py, TILE, TILE, PAL.grassDark, 0.1, cell.seed);
+        } else if (cell.ground === "sand") {
+          fillRect(ctx, px, py, TILE, TILE, PAL.sand);
+          dither(ctx, px, py, TILE, TILE, PAL.soil, 0.08, cell.seed);
+        } else if (cell.ground === "water") {
+          const t = Math.sin((waterPhase / 60) * Math.PI * 2 + cell.seed * 10) * 1.5;
+          fillRect(ctx, px, py, TILE, TILE, PAL.water);
+          stripe(ctx, px, py + (t % 2), TILE, TILE, PAL.waterDark, 3);
+        }
+      }
+
+      function drawContent(ctx, px, py, cell, grid, PAL, TILE, phase) {
+        switch (cell.content) {
+          case null:
+            return;
+          case "road":
+            drawRoad(ctx, px, py, cell.roadMask ?? 0, PAL, TILE);
+            return;
+          case "tree":
+            drawTree(ctx, px, py, PAL, TILE, (phase % 30) < 15 ? 0 : 1);
+            return;
+          case "house":
+            drawHouse(ctx, px, py, PAL, TILE);
+            return;
+          case "farm":
+            drawFarm(ctx, px, py, PAL, TILE, phase);
+            return;
+          case "factory":
+            drawFactory(ctx, px, py, PAL, TILE, phase);
+            return;
+          case "wind":
+            drawWind(ctx, px, py, PAL, TILE, phase);
+            return;
+          case "park":
+            drawPark(ctx, px, py, PAL, TILE);
+            return;
+        }
+      }
+
+      function fillRect(ctx, x, y, w, h, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, w, h);
+      }
+      function dither(ctx, x, y, w, h, color, density, seed) {
+        const step = 2;
+        ctx.fillStyle = color;
+        for (let yy = 0; yy < h; yy += step) {
+          for (let xx = ((yy / step) | 0) % 2; xx < w; xx += 2) {
+            if (Math.random() < density + ((seed * 1000) % 0.1)) ctx.fillRect(x + xx, y + yy, 1, 1);
+          }
+        }
+      }
+      function stripe(ctx, x, y, w, h, color, every) {
+        ctx.fillStyle = color;
+        for (let yy = 0; yy < h; yy++) if (yy % every === 0) ctx.fillRect(x, y + yy, w, 1);
+      }
+
+      function drawRoad(ctx, x, y, mask, PAL, TILE) {
+        fillRect(ctx, x, y, TILE, TILE, PAL.road);
+        ctx.fillStyle = PAL.roadDark;
+        ctx.fillRect(x, y + TILE - 4, TILE, 4);
+        ctx.fillStyle = PAL.white;
+        const cx = x + (TILE >> 1) - 1;
+        const cy = y + (TILE >> 1) - 1;
+        ctx.fillRect(cx, y + 2, 2, TILE - 4);
+        ctx.fillRect(x + 2, cy, TILE - 4, 2);
+        if (!(mask & 1)) ctx.clearRect(cx, y, 2, 6);
+        if (!(mask & 2)) ctx.clearRect(x + TILE - 6, cy, 6, 2);
+        if (!(mask & 4)) ctx.clearRect(cx, y + TILE - 6, 2, 6);
+        if (!(mask & 8)) ctx.clearRect(x, cy, 6, 2);
+      }
+
+      function drawTree(ctx, x, y, PAL, TILE, sway) {
+        ctx.fillStyle = PAL.trunk;
+        ctx.fillRect(x + TILE / 2 - 2, y + TILE - 8, 4, 8);
+        const leafColor = sway ? PAL.treeDark : PAL.treeLeaf;
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(x + 6, y + 6, TILE - 12, TILE - 10);
+        ctx.fillRect(x + 4, y + 10, TILE - 8, TILE - 12);
+        ctx.fillStyle = PAL.white;
+        ctx.fillRect(x + TILE - 8, y + 8, 1, 1);
+      }
+
+      function drawHouse(ctx, x, y, PAL, TILE) {
+        ctx.fillStyle = PAL.houseWall;
+        ctx.fillRect(x + 3, y + 9, TILE - 6, TILE - 6);
+        ctx.fillStyle = PAL.houseRoof;
+        ctx.beginPath();
+        ctx.moveTo(x + 2, y + 10);
+        ctx.lineTo(x + TILE - 2, y + 10);
+        ctx.lineTo(x + TILE / 2, y + 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = PAL.roadDark;
+        ctx.fillRect(x + TILE / 2 - 2, y + TILE - 8, 4, 8);
+        ctx.fillStyle = PAL.white;
+        ctx.fillRect(x + 6, y + 13, 4, 4);
+        ctx.fillRect(x + TILE - 10, y + 13, 4, 4);
+      }
+
+      function drawFarm(ctx, x, y, PAL, TILE, phase) {
+        fillRect(ctx, x + 2, y + 10, TILE - 4, TILE - 6, PAL.soil);
+        const wave = Math.floor((phase / 8) % 3);
+        ctx.fillStyle = PAL.farmCrop;
+        for (let i = 0; i < 4; i++) {
+          ctx.fillRect(x + 4, y + 11 + i * 3 + wave % 2, TILE - 8, 2);
+        }
+        ctx.fillStyle = PAL.trunk;
+        ctx.fillRect(x + TILE / 2 - 1, y + 8, 2, 6);
+        ctx.fillRect(x + TILE / 2 - 5, y + 9, 10, 2);
+      }
+
+      function drawFactory(ctx, x, y, PAL, TILE, phase) {
+        ctx.fillStyle = PAL.factory;
+        ctx.fillRect(x + 3, y + 12, TILE - 6, TILE - 8);
+        ctx.fillRect(x + 6, y + 6, 4, 8);
+        ctx.fillRect(x + 12, y + 4, 4, 10);
+        const p = (phase % 60) / 60;
+        ctx.fillStyle = PAL.smoke;
+        ctx.fillRect(x + 7, y + 5 - Math.floor(p * 6), 3, 3);
+        ctx.fillRect(x + 13, y + 3 - Math.floor(((p + 0.3) % 1) * 6), 3, 3);
+      }
+
+      function drawWind(ctx, x, y, PAL, TILE, phase) {
+        ctx.fillStyle = PAL.turbine;
+        ctx.fillRect(x + TILE / 2 - 1, y + 6, 2, TILE - 6);
+        const cx = x + TILE / 2;
+        const cy = y + 8;
+        ctx.fillRect(cx - 1, cy - 1, 2, 2);
+        const ang = ((phase % 60) / 60) * Math.PI * 2;
+        blade(ctx, cx, cy, ang, PAL.turbine);
+        blade(ctx, cx, cy, ang + (2 * Math.PI) / 3, PAL.turbine);
+        blade(ctx, cx, cy, ang + (4 * Math.PI) / 3, PAL.turbine);
+      }
+      function blade(ctx, cx, cy, ang, color) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(ang);
+        ctx.fillStyle = color;
+        ctx.fillRect(0, -1, 8, 2);
+        ctx.restore();
+      }
+
+      function drawPark(ctx, x, y, PAL, TILE) {
+        fillRect(ctx, x + 2, y + 2, TILE - 4, TILE - 4, PAL.park);
+        ctx.fillStyle = "#e9d5a1";
+        ctx.fillRect(x + TILE / 2 - 2, y + 4, 4, TILE - 8);
+        ctx.fillStyle = PAL.trunk;
+        ctx.fillRect(x + 5, y + TILE - 9, 8, 2);
+        ctx.fillRect(x + 5, y + TILE - 7, 8, 2);
+        ctx.fillRect(x + 6, y + TILE - 5, 1, 2);
+        ctx.fillRect(x + 11, y + TILE - 5, 1, 2);
+      }
+
+      function StatPill({ label, value, accent, emoji }) {
+        return (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-white shadow-sm">
+            <span className="text-base" aria-hidden>{emoji}</span>
+            <span className="text-xs text-slate-500">{label}</span>
+            <span className="text-sm font-semibold" style={{ color: accent }}>{value}</span>
+          </div>
+        );
+      }
+
+      function ToolPreview({ id, PAL, TILE = 16 }) {
+        const ref = React.useRef(null);
+        React.useEffect(() => {
+          const cv = ref.current;
+          if (!cv) return;
+          const ctx = cv.getContext("2d");
+          if (!ctx) return;
+          ctx.imageSmoothingEnabled = false;
+          fillRect(ctx, 0, 0, TILE, TILE, PAL.grass);
+          if (id === "pond") fillRect(ctx, 0, 0, TILE, TILE, PAL.water);
+          const cell = { content: null, roadMask: 0 };
+          if (id === "road") cell.content = "road";
+          if (id === "house") cell.content = "house";
+          if (id === "tree") cell.content = "tree";
+          if (id === "farm") cell.content = "farm";
+          if (id === "factory") cell.content = "factory";
+          if (id === "wind") cell.content = "wind";
+          if (id === "park") cell.content = "park";
+          if (id === "grass") { /* nothing */ }
+          if (id === "bulldoze") {
+            ctx.fillStyle = PAL.outline;
+            ctx.fillRect(2, 6, 12, 6);
+            ctx.clearRect(3, 7, 6, 4);
+            ctx.fillRect(9, 4, 4, 4);
+          } else if (cell.content) {
+            const grid = [];
+            drawContent(ctx, 0, 0, cell, grid, PAL, TILE, 0);
+          }
+        }, [id, PAL, TILE]);
+        return <canvas ref={ref} width={TILE} height={TILE} className="w-6 h-6" />;
+      }
+
+      function Toast() {
+        const [msg, setMsg] = React.useState(null);
+        const [show, setShow] = React.useState(false);
+        React.useEffect(() => {
+          window._cozy_toast = (m) => {
+            setMsg(m);
+            setShow(true);
+            setTimeout(() => setShow(false), 1300);
+          };
+        }, []);
+        return (
+          <div className={"px-3 py-2 rounded-xl border bg-white shadow-sm text-sm " + (show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2") + " transition"}>
+            {msg}
+          </div>
+        );
+      }
+      function toast(m) {
+        if (window._cozy_toast) window._cozy_toast(m);
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<CozyPixelCity />);
+    </script>
+  </body>
+</html>
+"""
+path = "/mnt/data/cozy-pixel-city.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+path

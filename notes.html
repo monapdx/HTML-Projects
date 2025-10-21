@@ -1,0 +1,182 @@
+<style type="text/css">
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+
+
+.snippet-container {
+            margin-top: 20px;
+        }
+        .snippet {
+			font-family: "Oswald", serif;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        input[readonly], textarea[readonly] {
+            background-color: #f9f9f9;
+			font-family: "Oswald", serif;
+            border: 1px solid #ddd;
+            padding: 8px;
+            width: 100%;
+        }
+        textarea {
+              width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-family: "Oswald", serif;
+    border: 1px solid #ddd;
+  border-radius: 5px; /* Round the corners */
+  background-color: #f2f2f2;
+        }
+        
+        textarea:focus {outline: none; /* Remove the default focus outline */
+  border-color: blue; /* Change the border color on focus */
+  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);}
+h2 {
+font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 5px;
+	position: relative;
+}
+
+
+
+/* Input Section */
+#input-container {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px; /* Round the corners */
+  background-color: #f2f2f2;
+
+}
+
+input:focus {outline: none; /* Remove the default focus outline */
+  border-color: blue; /* Change the border color on focus */
+  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);}
+
+button.add {
+font-family: "Oswald", serif;
+  margin-top: 10px;
+  width: 100%;
+  background: #007bff; /* Blue button */
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  height:auto;
+}
+
+button.add:hover {
+  background: #0056b3; /* Darker blue on hover */
+}
+
+
+</style>
+
+
+<label for="title"></label><h2>TITLE</h2>
+    <input type="text" id="title" placeholder="Enter title">
+    <label for="snippet"></label><h2>SNIPPET</h2>
+    <textarea id="snippet" placeholder="Enter your snippet"></textarea><br><br>
+    <button id="save-btn" class="add">Save</button>
+
+    <div class="snippet-container" id="snippet-container"></div>
+<script>
+        const titleInput = document.getElementById('title');
+        const snippetInput = document.getElementById('snippet');
+        const saveButton = document.getElementById('save-btn');
+        const snippetContainer = document.getElementById('snippet-container');
+
+        // Load saved snippets from localStorage on page load
+        const loadSnippets = () => {
+            const snippets = JSON.parse(localStorage.getItem('snippets')) || [];
+            snippets.forEach(({ title, snippet }, index) => addSnippetToDOM(title, snippet, index));
+        };
+
+        // Save snippet to localStorage
+        const saveSnippet = () => {
+            const title = titleInput.value.trim();
+            const snippet = snippetInput.value.trim();
+
+            if (!title || !snippet) {
+                alert('Both Title and Snippet are required.');
+                return;
+            }
+
+            const snippets = JSON.parse(localStorage.getItem('snippets')) || [];
+            snippets.push({ title, snippet });
+            localStorage.setItem('snippets', JSON.stringify(snippets));
+
+            addSnippetToDOM(title, snippet, snippets.length - 1);
+            titleInput.value = '';
+            snippetInput.value = '';
+        };
+
+        // Add snippet to the DOM
+        const addSnippetToDOM = (title, snippet, index) => {
+            const snippetDiv = document.createElement('div');
+            snippetDiv.className = 'snippet';
+            snippetDiv.setAttribute('data-index', index); // Track index for deletion
+
+            const titleField = document.createElement('input');
+            titleField.type = 'text';
+            titleField.value = title;
+            titleField.readOnly = true;
+
+            const snippetField = document.createElement('textarea');
+            snippetField.value = snippet;
+            snippetField.readOnly = true;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'delete-btn';
+            deleteButton.onclick = () => deleteSnippet(index);
+
+            snippetDiv.appendChild(titleField);
+            snippetDiv.appendChild(snippetField);
+            snippetDiv.appendChild(deleteButton);
+            snippetContainer.appendChild(snippetDiv);
+        };
+
+        // Delete snippet from localStorage and DOM
+        const deleteSnippet = (index) => {
+            let snippets = JSON.parse(localStorage.getItem('snippets')) || [];
+            snippets.splice(index, 1); // Remove snippet at index
+            localStorage.setItem('snippets', JSON.stringify(snippets)); // Update storage
+
+            // Refresh the DOM to reflect changes
+            snippetContainer.innerHTML = '';
+            loadSnippets(); // Reload all snippets
+        };
+
+        saveButton.addEventListener('click', saveSnippet);
+
+        // Load snippets on page load
+        loadSnippets();
+    </script>

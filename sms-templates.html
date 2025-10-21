@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Templates</title>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+  
+    body {
+font-family: "Oswald", serif;
+      line-height: 1.6;
+      margin: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th,
+    table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: #f2f2f2;
+    }
+
+    table td .copy-button {
+    font-family: "Oswald", serif;
+      padding: 5px 10px;
+      background: #007bff; /* Blue button */
+  color: #fff;
+      border: none;
+      cursor: pointer;
+      width:100%;
+    }
+
+    table td .copy-button.copied {
+      background: #007bff;
+    }
+
+    textarea {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .add-template-btn {
+      font-family: "Oswald", serif;
+      padding: 10px;
+        background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .add-template-btn:hover {
+        background: #007bff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>SMS Templates</h2>
+
+  <textarea id="new-template" placeholder="Enter new SMS template..."></textarea>
+  <button class="add-template-btn" onclick="addTemplate()">Add Template</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Template</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="template-table-body">
+      <tr>
+       
+      </tr>
+      <tr>
+        
+      </tr>
+      <tr>
+        
+      </tr>
+      <tr>
+       
+      </tr>
+      <tr>
+       
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+
+  <script>
+    function copyText(button, text) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          button.textContent = 'Copied';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.textContent = 'Copy';
+            button.classList.remove('copied');
+          }, 2000); // Reset button text after 2 seconds
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+    }
+
+    function addTemplate() {
+      const textarea = document.getElementById('new-template');
+      const newTemplate = textarea.value.trim();
+
+      if (newTemplate === '') {
+        alert('Please enter a valid SMS template.');
+        return;
+      }
+
+      // Clear textarea
+      textarea.value = '';
+
+      // Create new table row
+      const newRow = document.createElement('tr');
+      const templateCell = document.createElement('td');
+      templateCell.textContent = newTemplate;
+      const actionCell = document.createElement('td');
+      const copyButton = document.createElement('button');
+      copyButton.classList.add('copy-button');
+      copyButton.textContent = 'Copy';
+      copyButton.onclick = function () {
+        copyText(copyButton, newTemplate);
+      };
+      actionCell.appendChild(copyButton);
+      newRow.appendChild(templateCell);
+      newRow.appendChild(actionCell);
+
+      // Add row to table body
+      const tableBody = document.getElementById('template-table-body');
+      tableBody.appendChild(newRow);
+    }
+  </script>
+
+</body>
+
+</html>

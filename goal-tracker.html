@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Goal Progress Tracker</title>
+  <style>
+
+  /* --- Base / page --- */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: #111827; /* near-black */
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial;
+    line-height: 1.45;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 24px auto 56px;
+    padding: 0 16px;
+  }
+
+  /* --- Section headers (e.g., DICTIONARY / THESAURUS) --- */
+  h1, h2, h3 {
+    margin: 0 0 10px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    font-family: Oswald, Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  }
+
+  /* --- Form blocks --- */
+  .form-block {
+    margin: 18px 0 30px;
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+
+  input[type="text"],
+  input[type="url"],
+  input[type="number"],
+  input[type="search"] {
+    width: 100%;
+    background: #f3f4f6;      /* light gray like screenshot */
+    color: #111827;
+    border: 1px solid #e5e7eb; /* subtle border */
+    border-radius: 8px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  input::placeholder { color: #9ca3af; }
+  input:focus {
+    background: #ffffff;
+    border-color: #1d4ed8; /* blue-700 */
+    box-shadow: 0 0 0 3px rgba(59,130,246,.25);
+  }
+
+  /* --- Buttons --- */
+  .btn, button, input[type="submit"] {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;               /* full width like screenshot */
+    background: #0a84ff;       /* bright blue */
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: .6px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(10,132,255,.35);
+    transition: filter .15s ease, transform .05s ease, box-shadow .2s ease;
+  }
+  .btn:hover, button:hover, input[type="submit"]:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 8px 22px rgba(10,132,255,.42);
+  }
+  .btn:active, button:active, input[type="submit"]:active {
+    transform: translateY(1px);
+  }
+
+  /* --- Spacing between input and button like screenshot --- */
+  .spacer-8 { height: 8px; }
+  .spacer-16 { height: 16px; }
+
+  /* --- Optional wrapper for each tool panel --- */
+  .panel {
+    padding: 0; /* screenshot shows no card frame—keep clean */
+    border: 0;
+    background: transparent;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 720px) {
+    .container { padding: 0 12px; }
+  }
+
+</style>
+</head>
+<body>
+  <header>
+    <h1>Goal Progress Tracker</h1>
+    <p class="sub">Paste a product link, set the price and how much you've saved. I'll fetch the title & image and track your progress.</p>
+  </header>
+
+  <div class="container">
+    <div class="panel" style="margin-bottom: 16px;">
+      <form id="addGoalForm">
+        <div>
+          <label for="url">Product URL</label>
+          <input id="url" type="url" placeholder="https://store.example.com/product" required />
+        </div>
+        <div>
+          <label for="price">Price (USD)</label>
+          <input id="price" type="number" inputmode="decimal" step="0.01" min="0" placeholder="999.99" required />
+        </div>
+        <div>
+          <label for="saved">Saved So Far (USD)</label>
+          <input id="saved" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" />
+        </div>
+        <div>
+          <label for="title">(Optional) Title</label>
+          <input id="title" type="text" placeholder="Auto-fills from link" />
+        </div>
+        <div style="display:flex; gap:8px; align-items:end;">
+          <button type="button" class="btn btn-secondary" id="fetchMetaBtn" title="Fetch title & image from the link">Fetch</button>
+          <button class="btn" type="submit">Add Goal</button>
+        </div>
+        <div style="grid-column: 1 / -1; display:none;" id="imageFieldWrap">
+          <label for="imageUrl">(Optional) Image URL (auto-filled if found)</label>
+          <input id="imageUrl" type="url" placeholder="https://...jpg" />
+        </div>
+      </form>
+      <p id="hint" style="margin:10px 2px 0; color:var(--muted); font-size:13px;">
+        Tip: If a site blocks previews, you can paste a title and/or image manually. Your goals are saved locally in your browser.
+      </p>
+    </div>
+
+    <div id="goalsWrap" class="grid"></div>
+    <div id="emptyState" class="empty" style="display:none;">No goals yet. Add your first one above ✨</div>
+  </div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+  const storeKey = 'goal_tracker_v1';
+
+  const state = {
+    goals: load()
+  };
+
+  function load(){
+    try { return JSON.parse(localStorage.getItem(storeKey)) || []; }
+    catch { return []; }
+  }
+  function save(){ localStorage.setItem(storeKey, JSON.stringify(state.goals)); }
+
+  function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+  function percent(saved, price){
+    if (!price || price <= 0) return 0;
+    return Math.max(0, Math.min(100, (saved / price) * 100));
+  }
+
+  function render(){
+    const wrap = $('#goalsWrap');
+    wrap.innerHTML = '';
+    if (!state.goals.length){
+      $('#emptyState').style.display = 'block';
+      return;
+    }
+    $('#emptyState').style.display = 'none';
+
+    state.goals.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="media">
+          <img src="${escapeHtml(g.image || placeholderImage(g.title))}" alt="${escapeHtml(g.title || 'Goal image')}" onerror="this.src='${placeholderImage(g.title)}'"/>
+          <span class="badge">${Math.round(percent(g.saved, g.price))}%</span>
+        </div>
+        <div class="body">
+          <div class="title-row">
+            <a href="${escapeAttr(g.url)}" target="_blank" rel="noopener">${escapeHtml(g.title || new URL(g.url).hostname)}</a>
+            <button class="btn btn-danger" data-del="${g.id}" title="Delete">Delete</button>
+          </div>
+          <div class="numbers">
+            <div>Price<strong>${fmt.format(g.price || 0)}</strong></div>
+            <div>Saved<strong>${fmt.format(g.saved || 0)}</strong></div>
+            <div>Remaining<strong>${fmt.format(Math.max(0, (g.price||0) - (g.saved||0)))}</strong></div>
+          </div>
+          <div class="progress"><div class="bar" style="width:${percent(g.saved, g.price)}%"></div></div>
+          <div class="actions">
+            <input type="number" step="0.01" min="0" placeholder="Add or set saved…" value="" data-addsaved="${g.id}" />
+            <button class="btn btn-secondary" data-add="${g.id}">Add to Saved</button>
+            <button class="btn" data-set="${g.id}">Set Saved</button>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(card);
+    });
+
+    // wire actions
+    $$("[data-del]").forEach(b => b.onclick = () => {
+      const id = b.getAttribute('data-del');
+      state.goals = state.goals.filter(x => x.id !== id);
+      save(); render();
+    });
+
+    $$("[data-add]").forEach(b => b.onclick = () => {
+      const id = b.getAttribute('data-add');
+      const input = document.querySelector(`[data-addsaved="${id}"]`);
+      const val = toNum(input.value);
+      if (val > 0){
+        const g = state.goals.find(x => x.id === id);
+        g.saved = round2((g.saved || 0) + val);
+        input.value = '';
+        save(); render();
+      }
+    });
+
+    $$("[data-set]").forEach(b => b.onclick = () => {
+      const id = b.getAttribute('data-set');
+      const input = document.querySelector(`[data-addsaved="${id}"]`);
+      const val = toNum(input.value);
+      if (val >= 0){
+        const g = state.goals.find(x => x.id === id);
+        g.saved = round2(val);
+        input.value = '';
+        save(); render();
+      }
+    });
+  }
+
+  function toNum(v){ return Math.max(0, Number.parseFloat(v || '0')) || 0; }
+  function round2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+
+  function placeholderImage(text){
+    const t = encodeURIComponent((text || 'Goal').slice(0, 16));
+    // cute gradient placeholder using dummyimage
+    return `https://dummyimage.com/800x500/0b1220/94a3b8&text=${t}`;
+  }
+
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
+  function escapeAttr(s){ return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+  async function fetchMetadata(url){
+    // Try Jina Reader as a CORS-friendly fetcher, then parse OG/Twitter tags
+    const normalized = normalizeUrl(url);
+    const readerUrl = `https://r.jina.ai/http://${normalized.replace(/^https?:\/\//,'')}`;
+    try {
+      const res = await fetch(readerUrl, { method: 'GET' });
+      if (!res.ok) throw new Error('Reader failed');
+      const html = await res.text();
+      const title = matchFirst(html, /<meta\s+property=["']og:title["']\s+content=["']([^"']+)["'][^>]*>/i)
+                 || matchFirst(html, /<meta\s+name=["']twitter:title["']\s+content=["']([^"']+)["'][^>]*>/i)
+                 || matchFirst(html, /<title>([^<]+)<\/title>/i);
+      const image = matchFirst(html, /<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i)
+                 || matchFirst(html, /<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i);
+      return { title, image };
+    } catch (e){
+      console.warn('Metadata fetch failed:', e);
+      return { title: '', image: '' };
+    }
+  }
+
+  function matchFirst(str, regex){
+    const m = regex.exec(str);
+    return m ? m[1].trim() : '';
+  }
+
+  function normalizeUrl(u){
+    try { return new URL(u).href; } catch { return 'https://' + (u||'').replace(/^\/*/, ''); }
+  }
+
+  // Form handlers
+  $('#fetchMetaBtn').addEventListener('click', async () => {
+    const url = $('#url').value.trim();
+    if (!url) return;
+    toggleImageField(true);
+    const { title, image } = await fetchMetadata(url);
+    if (title) $('#title').value = title;
+    if (image) $('#imageUrl').value = image;
+  });
+
+  function toggleImageField(show){ $('#imageFieldWrap').style.display = show ? 'block' : 'none'; }
+
+  $('#addGoalForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const url = $('#url').value.trim();
+    const price = toNum($('#price').value);
+    const saved = toNum($('#saved').value);
+    let title = $('#title').value.trim();
+    let image = $('#imageUrl').value.trim();
+
+    if (!title || !image){
+      const meta = await fetchMetadata(url);
+      title = title || meta.title || '';
+      image = image || meta.image || '';
+    }
+
+    const goal = { id: uid(), url: normalizeUrl(url), title, image, price, saved };
+    state.goals.unshift(goal);
+    save();
+    // reset form
+    e.target.reset();
+    toggleImageField(false);
+    render();
+  });
+
+  // initial
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Merged Tag Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+    body {
+      font-family: "Oswald", serif;
+      padding: 2rem;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    select, input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: blue;
+      box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
+    }
+
+    textarea {
+      height: 300px;
+      font-family: "Oswald", serif;
+      resize: vertical;
+    }
+
+    button {
+      font-family: "Oswald", serif;
+      background: #007bff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #nestedOptions {
+      padding-left: 15px;
+      margin-top: 10px;
+      border-left: 2px solid #ddd;
+    }
+
+    .controls {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    #copyMessage {
+      display: none;
+      color: green;
+      font-weight: bold;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Generate HTML Tags with Classes</h2>
+
+  <div class="controls">
+    <label for="tagType">Tag Type:</label>
+    <select id="tagType">
+      <option value="a">A</option>
+      <option value="p">P</option>
+      <option value="h1">H1</option>
+      <option value="h2">H2</option>
+      <option value="img">IMG</option>
+      <option value="div">DIV</option>
+      <option value="span">SPAN</option>
+      <option value="input">INPUT</option>
+      <option value="section">SECTION</option>
+      <option value="option">OPTION</option>
+      <option value="ul">UL</option>
+      <option value="ol">OL</option>
+    </select>
+
+    <div id="inputTypeContainer" style="display:none;">
+      <label for="inputType">Input Type:</label>
+      <select id="inputType">
+        <option value="text">Text</option>
+        <option value="checkbox">Checkbox</option>
+        <option value="radio">Radio</option>
+      </select>
+    </div>
+
+    <label for="tagCount">How Many?</label>
+    <select id="tagCount">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="25">25</option>
+      <option value="30">30</option>
+    </select>
+
+    <label for="tagClass">Class (optional):</label>
+    <input type="text" id="tagClass" placeholder="Enter class name" />
+
+    <label for="tagId">ID (optional):</label>
+    <input type="text" id="tagId" placeholder="Enter id" />
+
+    <label for="enableNested">Nested Tags:</label>
+    <input type="checkbox" id="enableNested" />
+
+    <div id="nestedOptions" style="display:none;">
+      <label for="parentTagType">Parent Tag:</label>
+      <select id="parentTagType">
+        <option value="div">DIV</option>
+        <option value="article">ARTICLE</option>
+        <option value="section">SECTION</option>
+        <option value="ul">UL</option>
+        <option value="ol">OL</option>
+      </select>
+
+      <label for="tagTypeNested">Child Tag:</label>
+      <select id="tagTypeNested">
+        <option value="p">P</option>
+        <option value="h1">H1</option>
+        <option value="h2">H2</option>
+        <option value="li">LI</option>
+        <option value="section">SECTION</option>
+        <option value="span">SPAN</option>
+        <option value="div">DIV</option>
+      </select>
+
+      <label for="childCount">Child Count:</label>
+      <select id="childCount">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+      </select>
+
+      <label for="childClass">Child Class (optional):</label>
+      <input type="text" id="childClass" />
+
+      <label for="childId">Child ID (optional):</label>
+      <input type="text" id="childId" />
+    </div>
+
+    <button type="button" id="generateBtn">Generate Tags</button>
+
+    <textarea id="output" readonly placeholder="Generated HTML will appear here..."></textarea>
+    <button type="button" id="copyBtn">Copy to Clipboard</button>
+    <div id="copyMessage">Copied!</div>
+  </div>
+
+  <script>
+    const tagType = document.getElementById('tagType');
+    const inputTypeContainer = document.getElementById('inputTypeContainer');
+    tagType.addEventListener('change', () => {
+      inputTypeContainer.style.display = tagType.value === 'input' ? 'block' : 'none';
+    });
+
+    const enableNested = document.getElementById('enableNested');
+    const nestedDiv = document.getElementById('nestedOptions');
+    enableNested.addEventListener('change', () => {
+      nestedDiv.style.display = enableNested.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const tagTypeVal = tagType.value;
+      const tagCount = parseInt(document.getElementById('tagCount').value, 10);
+      const tagClass = document.getElementById('tagClass').value.trim();
+      const tagId = document.getElementById('tagId').value.trim();
+      const isNested = enableNested.checked;
+
+      let generatedHTML = '';
+
+      function buildAttributes(cls, id) {
+        let attributes = '';
+        if (cls) attributes += ` class="${cls}"`;
+        if (id) attributes += ` id="${id}"`;
+        return attributes;
+      }
+
+      if (isNested) {
+        const parentTagType = document.getElementById('parentTagType').value;
+        const childTagType = document.getElementById('tagTypeNested').value;
+        const childCount = parseInt(document.getElementById('childCount').value, 10);
+        const childClass = document.getElementById('childClass').value.trim();
+        const childId = document.getElementById('childId').value.trim();
+
+        for (let i = 0; i < tagCount; i++) {
+          generatedHTML += `<${parentTagType}${buildAttributes(tagClass, tagId)}>\n`;
+
+          for (let j = 0; j < childCount; j++) {
+            generatedHTML += `  <${childTagType}${buildAttributes(childClass, childId)}></${childTagType}>\n`;
+          }
+
+          generatedHTML += `</${parentTagType}>\n\n`;
+        }
+      } else {
+        for (let i = 0; i < tagCount; i++) {
+          if (tagTypeVal === 'input') {
+            const inputType = document.getElementById('inputType').value;
+            generatedHTML += `<${tagTypeVal} type="${inputType}"${buildAttributes(tagClass, tagId)} />\n`;
+          } else if (tagTypeVal === 'img') {
+            generatedHTML += `<${tagTypeVal} src="" alt=""${buildAttributes(tagClass, tagId)} />\n`;
+          } else if (tagTypeVal === 'a') {
+            generatedHTML += `<${tagTypeVal} href=""${buildAttributes(tagClass, tagId)}></${tagTypeVal}>\n`;
+          } else {
+            generatedHTML += `<${tagTypeVal}${buildAttributes(tagClass, tagId)}></${tagTypeVal}>\n`;
+          }
+        }
+      }
+
+      document.getElementById('output').value = generatedHTML;
+      document.getElementById('copyMessage').style.display = 'none';
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const output = document.getElementById('output');
+      output.select();
+      output.setSelectionRange(0, 99999);
+
+      try {
+        document.execCommand('copy');
+        const msg = document.getElementById('copyMessage');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2000);
+      } catch (err) {
+        alert('Failed to copy. Please copy manually.');
+      }
+    });
+  </script>
+
+</body>
+</html>

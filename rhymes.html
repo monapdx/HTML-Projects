@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rhyme Finder · Datamuse API</title>
+  <!-- Fonts to match your tools -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <style id="base-theme">
+    :root {
+      --accent: #007bff;
+      --accent-600: #0056b3;
+      --text: #111;
+      --muted: #555;
+      --bg: #fff;
+      --border: #ddd;
+      --input-bg: #f2f2f2;
+      --chip-bg: #f7f7f7;
+      --radius: 8px;
+      --shadow: 0 6px 18px rgba(0,0,0,.06);
+      --space: clamp(10px, 2vw, 16px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0e1013; --text:#e8e8ea; --muted:#a2a7b0; --border:#262a33; --input-bg:#171b22; --chip-bg:#141820; --accent:#69a7ff; --accent-600:#4d83d1; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: var(--space); font-family: Arial, Helvetica, sans-serif; color: var(--text); background: var(--bg); }
+    .wrap { max-width: min(1000px, 100%); margin: 0 auto; padding-inline: max(0px, env(safe-area-inset-left)); }
+
+    /* Fluid, responsive type */
+    h1 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing:.05em; font-size: clamp(1.25rem, 2vw + .5rem, 1.8rem); margin: 0 0 .6rem; }
+    h2 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing:.05em; font-size: clamp(1rem, 1.2vw + .6rem, 1.25rem); margin: 0 0 .7rem; padding: 4px 8px; }
+    h3 { font-family: "Oswald", sans-serif; text-transform: uppercase; letter-spacing:.03em; font-size: clamp(.9rem, 1vw + .5rem, 1.05rem); }
+
+    .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space); box-shadow: var(--shadow); }
+
+    /* Main input row becomes single-column on narrow screens */
+    .row { display: grid; grid-template-columns: 1fr auto; gap: var(--space); align-items: end; }
+
+    .controls { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: var(--space); margin-top: var(--space); }
+
+    label { font-size: .9rem; color: var(--muted); margin-bottom: 4px; display: grid; gap: 6px; font-weight: 700; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; padding: 12px 12px; font-size: clamp(.95rem, .8vw + .6rem, 1rem);
+      border: 1px solid var(--border); background: var(--input-bg); border-radius: 6px; color: var(--text);
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+
+    button { background: var(--accent); color: #fff; font-size: clamp(.95rem, .8vw + .6rem, 1rem); padding: 12px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; transition: background .2s ease, transform .03s ease; }
+    button:hover { background: var(--accent-600); }
+    button:active { transform: translateY(1px); }
+    button.primary { width: auto; }
+
+    .tiny { font-size: .8rem; color: var(--muted); }
+    .results { margin-top: var(--space); display: grid; gap: var(--space); grid-template-columns: 1fr; }
+    .group { border: 1px solid var(--border); border-radius: 6px; padding: 10px; background: var(--bg); }
+    .group h3 { margin: 0 0 8px; color: var(--text); display:flex; align-items:center; justify-content:space-between; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--chip-bg); font-family: "Oswald", sans-serif; line-height: 1; }
+    .footer { margin-top: 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+
+    /* Make results switch to a 2-column masonry on medium screens for denser layout */
+    @media (min-width: 880px) {
+      .results { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Tablet breakpoint: relax columns */
+    @media (max-width: 880px) {
+      .controls { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .row { grid-template-columns: 1fr auto; }
+      button.primary { width: auto; }
+    }
+
+    /* Mobile breakpoint: single column, full-width buttons/inputs */
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .wrap { padding: 0; }
+      .row { grid-template-columns: 1fr; }
+      button.primary { width: 100%; }
+      .controls { grid-template-columns: 1fr; }
+      .footer { gap: 6px; }
+    }
+
+    /* Ultra-small devices */
+    @media (max-width: 380px) {
+      .chip { padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1> <span class="tiny"></span></h1>
+
+    <div class="card" id="lookup-card">
+      <h2>Rhyme Finder</h2>
+      <div class="row" style="align-items:end;">
+        <div>
+          <label for="word">Enter a word</label>
+          <input id="word" type="text" placeholder="e.g., time" autocomplete="off" />
+        </div>
+        <button id="go" class="primary">Search</button>
+      </div>
+
+      <div class="controls">
+        <label>
+          Rhyme type
+          <select id="rhymeType">
+            <option value="rel_rhy" selected>Perfect rhymes</option>
+            <option value="rel_nry">Near / slant rhymes</option>
+          </select>
+        </label>
+        <label>
+          Min score (0–300)
+          <input id="minScore" type="number" value="100" min="0" max="300" step="10" />
+        </label>
+        <label>
+          Max results
+          <input id="maxRes" type="number" value="100" min="5" max="1000" step="5" />
+        </label>
+        <label>
+          Filter by syllables (optional)
+          <input id="syllables" type="number" min="1" max="10" placeholder="Any" />
+        </label>
+      </div>
+
+      <div class="footer tiny">
+        <span>API: <code>https://api.datamuse.com/words?rel_rhy=WORD</code></span>
+        <div>
+          <button id="copyAll">Copy list</button>
+          <button id="clearBtn">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="tiny" style="margin-top:10px" aria-live="polite"></div>
+    <div id="results" class="results"></div>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const word = el('word');
+    const go = el('go');
+    const results = el('results');
+    const statusEl = el('status');
+    const copyAllBtn = el('copyAll');
+    const clearBtn = el('clearBtn');
+
+    async function fetchRhymes() {
+      const q = word.value.trim();
+      const rhymeType = el('rhymeType').value; // rel_rhy or rel_nry
+      const minScore = Number(el('minScore').value || 0);
+      const maxRes = Math.min(Math.max(Number(el('maxRes').value || 100), 1), 1000);
+      const syllables = Number(el('syllables').value || 0);
+      if (!q) { word.focus(); return; }
+
+      results.innerHTML = '';
+      setStatus(`Searching rhymes for “${q}”…`);
+      go.disabled = true;
+
+      const url = new URL('https://api.datamuse.com/words');
+      url.searchParams.set(rhymeType, q);
+      url.searchParams.set('md', 's'); // include syllable counts
+      url.searchParams.set('max', String(maxRes));
+
+      try {
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        let data = await res.json();
+
+        data = data.filter(x => (x.score ?? 0) >= minScore && (!syllables || (x.numSyllables === syllables)));
+        data.sort((a,b) => (b.score||0)-(a.score||0) || a.word.localeCompare(b.word));
+
+        if (!data.length) { setStatus(`No results for “${q}”. Try lowering min score or switching rhyme type.`); return; }
+
+        const groups = groupBy(data, x => x.numSyllables ?? '—');
+        const ordered = Object.keys(groups).sort((a,b)=>Number(a)-Number(b));
+        for (const k of ordered) {
+          const group = groups[k];
+          const div = document.createElement('div');
+          div.className = 'group';
+          const title = document.createElement('h3');
+          title.textContent = `${k} syllable${Number(k)===1?'':'s'} (${group.length})`;
+          div.appendChild(title);
+          const chips = document.createElement('div');
+          chips.className = 'chips';
+          group.forEach(item => {
+            const c = document.createElement('span');
+            c.className = 'chip';
+            c.title = `score: ${item.score ?? '—'}`;
+            c.textContent = item.word;
+            c.addEventListener('click', () => { word.value = item.word; fetchRhymes(); });
+            chips.appendChild(c);
+          });
+          div.appendChild(chips);
+          results.appendChild(div);
+        }
+        setStatus(`Showing ${data.length} result(s) grouped by syllables.`);
+      } catch (err) {
+        console.error(err); setStatus('Error: ' + err.message + '. Are you online?');
+      } finally { go.disabled = false; }
+    }
+
+    function groupBy(arr, fn) { return arr.reduce((acc, x) => { const k = String(fn(x)); (acc[k] ||= []).push(x); return acc; }, {}); }
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    go.addEventListener('click', fetchRhymes);
+    word.addEventListener('keydown', e => { if (e.key === 'Enter') fetchRhymes(); });
+    clearBtn.addEventListener('click', () => { word.value=''; results.innerHTML=''; setStatus(''); word.focus(); });
+    copyAllBtn.addEventListener('click', async () => {
+      const list = Array.from(document.querySelectorAll('.chip')).map(x => x.textContent).join(', ');
+      try { await navigator.clipboard.writeText(list || ''); setStatus(list ? `Copied ${list.split(', ').length} word(s).` : 'Nothing to copy.'); }
+      catch { setStatus('Clipboard not available.'); }
+    });
+
+    // Prefill demo
+    word.value = '';
+    fetchRhymes();
+  </script>
+</body>
+</html>
