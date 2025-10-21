@@ -1,0 +1,176 @@
+<style type="text/css">
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#wordInput {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 2px solid #3498db;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#wordInput:focus {
+    border-color: #2980b9;
+}
+
+#statusMessage {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+table {
+    width: 100%;
+    height: auto;
+    border-collapse: collapse;
+    text-align: center;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+td {
+    border: 1px solid #ddd;
+    width: 16.66%;
+    padding: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #34495e;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    background-color: #ecf0f1;
+}
+
+td.filled {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.container h1 {
+    font-size: 28px;
+    color: #34495e;
+    margin-bottom: 10px;
+}
+
+.container p {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+@media (max-width: 600px) {
+    td {
+        font-size: 16px;
+        padding: 5px;
+    }
+}
+
+
+
+
+</style>
+<script type="text/javascript">
+let currentRow = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    createTable();
+    
+    document.getElementById("wordInput").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            addSentence();
+        }
+    });
+});
+
+function createTable() {
+    const table = document.getElementById("wordGrid");
+    for (let i = 0; i < 6; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < 6; j++) {
+            const cell = document.createElement("td");
+            cell.setAttribute("data-row", i);
+            cell.setAttribute("data-col", j);
+            row.appendChild(cell);
+        }
+        table.appendChild(row);
+    }
+}
+
+function addSentence() {
+    const wordInput = document.getElementById("wordInput");
+    const sentence = wordInput.value.trim();
+    const words = sentence.split(" ");
+    
+    if (words.length !== 6) {
+        alert("Please enter exactly six words.");
+        return;
+    }
+
+    for (let i = 0; i < words.length; i++) {
+        fillCell(currentRow, i, words[i]);
+        fillCell(i, currentRow, words[i]);
+    }
+    
+    currentRow++;
+
+    wordInput.value = "";
+
+    if (currentRow === 6) {
+        document.getElementById("statusMessage").textContent = "All cells filled!";
+        document.getElementById("wordInput").disabled = true;
+    }
+}
+
+function fillCell(row, col, word) {
+    const cell = document.querySelector(`td[data-row='${row}'][data-col='${col}']`);
+    cell.textContent = word;
+    cell.classList.add("filled"); // Trigger the animation
+}
+
+
+
+
+</script>
+<script src="https://unpkg.com/compromise"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Grid</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Word Grid Game</h1>
+        <p>Enter a six-word sentence to fill the grid.</p>
+        <input type="text" id="wordInput" placeholder="Type a six-word sentence">
+        <table id="wordGrid"></table>
+        <div id="statusMessage"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
