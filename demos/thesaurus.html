@@ -1,0 +1,119 @@
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#searchForm').submit(function(event) {
+        console.log('Form submitted'); // Check if this message appears in the console
+        event.preventDefault();
+
+        var word = $('#searchWord').val();
+        var uid = '12902'; // Your user ID
+        var tokenid = 'wftVAapX8A2VkZ8E'; // Your API token
+        var apiUrl = 'https://www.stands4.com/services/v2/syno.php';
+
+        $.ajax({
+            url: apiUrl,
+            type: 'GET',
+            data: {
+                uid: uid,
+                tokenid: tokenid,
+                word: word,
+                format: 'xml'
+            },
+            success: function(data) {
+                console.log('API response:', data); // Check API response in console
+                var synonyms = $(data).find('synonyms').text();
+                $('#synonymsResult').html('<strong>Synonyms:</strong> ' + synonyms);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching synonyms:', error);
+                $('#synonymsResult').html('<div class="error">Error fetching synonyms. Please try again.</div>');
+            }
+        });
+    });
+});
+
+
+
+
+</script>
+<style type="text/css">
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+
+
+h2 {
+font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;
+}
+
+
+label {
+ font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;
+    font-weight:bold;
+}
+
+#searchWord {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+   background-color: #f2f2f2;
+
+}
+
+input:focus {outline: none; /* Remove the default focus outline */
+  border-color: blue; /* Change the border color on focus */
+  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);}
+
+button {
+font-family: "Oswald", serif;
+  margin-top: 10px;
+  width: 100%;
+  background: #007bff; /* Blue button */
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  float:left;
+}
+
+button:hover {
+  background: #0056b3; /* Darker blue on hover */
+}
+
+#synonymsResult {font-family: "Oswald", serif;}
+
+</style>
+<form id="searchForm">
+    <label for="searchWord"></label><h2>THESAURUS</h2>
+    <input type="text" id="searchWord" name="word"><br><br>
+    <button type="submit">SEARCH</button><br>
+</form>
+<div id="synonymsResult"></div>
