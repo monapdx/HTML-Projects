@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Write Your Own Wikipedia Page</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--border:#d9dde7;--text:#111827;--muted:#6b7280;--blue:#1d4ed8;--shadow:0 1px 2px rgba(0,0,0,.05)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    header{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border)}
+    .container{max-width:1080px;margin:0 auto;padding:12px 16px}
+    h1,h2,h3{margin:0}
+    .title{font-size:22px;font-weight:600}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:6px 10px;box-shadow:var(--shadow);cursor:pointer}
+    .btn:hover{background:#f9fafb}
+    main{max-width:1080px;margin:0 auto;padding:18px 16px}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:16px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+    label{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    input,textarea{border:1px solid var(--border);border-radius:12px;padding:8px 10px;font:inherit}
+    textarea{min-height:120px;resize:vertical}
+    .infogrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .muted{color:var(--muted)}
+    .toc,.infobox{border:1px solid var(--border);background:#fff}
+    .mw{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:24px}
+    .mb{margin-bottom:12px}
+    .mb-lg{margin-bottom:18px}
+    .flex{display:flex}
+    .space{justify-content:space-between;align-items:center}
+    .link{color:var(--blue);text-decoration:none}
+    .link:hover{text-decoration:underline}
+    .right{float:right;margin:0 0 12px 16px;width:300px}
+    .list{padding-left:22px}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4)}
+    .modal.open{display:flex}
+    .modal-card{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:16px;max-width:560px;width:92vw;max-height:70vh;overflow:auto}
+    .danger{color:#b91c1c}
+    .small{font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container row">
+      <div class="title">What Will Your Wikipedia Page Say?</div>
+      <div style="margin-left:auto" class="row">
+        <button class="btn" id="btn-edit">Edit</button>
+        <button class="btn" id="btn-preview">Preview</button>
+        <button class="btn" id="btn-export-json">Export JSON</button>
+        <button class="btn" id="btn-export-html">Export HTML</button>
+        <input id="import-file" type="file" accept="application/json" style="display:none" />
+        <button class="btn" id="btn-import">Import</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="panel-edit" class="grid">
+      <div>
+        <div class="card mb-lg">
+          <h3 class="mb">Article</h3>
+          <label><span class="label">Title</span><input id="f-title" placeholder="Your name or article title"/></label>
+          <label><span class="label">Subtitle (optional)</span><input id="f-subtitle" placeholder="(born —)"/></label>
+          <label><span class="label">Lead (opening paragraph)</span><textarea id="f-lead" placeholder="Write a neutral lead summarizing who you are and what you are known for."></textarea></label>
+          <div class="row small muted"><span>Neutral tone helper:</span><span>I-words: <b id="m-first"></b></span><span>Superlatives: <b id="m-super"></b></span><span>! marks: <b id="m-excl"></b></span></div>
+        </div>
+        <div class="card">
+          <div class="row space mb"><h3>References (personal sources)</h3><button class="btn" id="btn-add-ref">Add</button></div>
+          <div id="refs"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card mb-lg">
+          <div class="row space mb"><h3>Infobox (person)</h3><div class="small muted">Appears on the right in preview</div></div>
+          <div class="infogrid">
+            <label><span class="label">Name</span><input id="i-name" placeholder="Full name"/></label>
+            <label><span class="label">Image URL</span><input id="i-image" placeholder="https://example.com/photo.jpg"/></label>
+            <label><span class="label">Caption</span><input id="i-caption" placeholder="Short image caption"/></label>
+            <label><span class="label">Born</span><input id="i-born" placeholder="Date and place of birth"/></label>
+            <label><span class="label">Residence</span><input id="i-residence" placeholder="Current residence"/></label>
+            <label><span class="label">Occupation</span><input id="i-occupation" placeholder="Occupation or role"/></label>
+            <label><span class="label">Known for</span><input id="i-knownfor" placeholder="Notable achievements or roles"/></label>
+            <label><span class="label">Years active</span><input id="i-years" placeholder="2001–present"/></label>
+            <label><span class="label">Website</span><input id="i-website" placeholder="example.com"/></label>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row space mb"><h3>Sections</h3>
+            <div class="row"><button class="btn" id="btn-insert-cite">Insert citation</button><button class="btn" id="btn-add-sec">Add section</button></div>
+          </div>
+          <div id="sections"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-preview" style="display:none">
+      <div id="wiki-page" class="mw">
+        <div class="mb" style="border-bottom:1px solid var(--border);padding-bottom:6px">
+          <h1 id="pv-title" style="font-size:28px;margin:0 0 4px 0"></h1>
+          <div id="pv-subtitle" class="muted"></div>
+        </div>
+        <nav id="pv-toc" class="toc mb" style="padding:10px;width:300px"></nav>
+        <aside id="pv-infobox" class="infobox right small" style="padding:10px"></aside>
+        <article>
+          <div id="pv-lead" class="mb"></div>
+          <div id="pv-sections"></div>
+          <section id="pv-refs" class="mb"></section>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-card">
+      <div class="row space mb"><h3>Insert citation</h3><button id="modal-close" class="btn">✕</button></div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    'use strict';
+    const STORAGE_KEY='personal-wikipedia-standalone-nocdn-v1';
+    const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const esc=(s='')=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const id=()=>Math.random().toString(36).slice(2,10);
+    const fslug=(s)=>String(s||'personal-wikipedia').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    const nurl=(u)=>!u?'' : (/^https?:\/\//i.test(u)?u:'https://'+u);
+
+    const defaultDoc={
+      title:'Your Name', subtitle:'(born —)', lead:'Write a neutral lead section summarizing who you are, what you do, and why you are notable in your own story.',
+      infobox:{image:'',caption:'',name:'Your Name',born:'',residence:'',occupation:'',knownFor:'',yearsActive:'',website:''},
+      sections:[{id:id(),heading:'Early life',content:'Describe early life context in neutral voice.'},{id:id(),heading:'Career',content:'Key milestones, projects, and roles.'}],
+      references:[{id:id(),title:'Moved to Portland (personal calendar entry)',date:'2018-06-01',url:'',note:'Personal life event — used as source for relocation date.'}]
+    };
+
+    let doc=load(); function load(){try{const raw=localStorage.getItem(STORAGE_KEY); return raw? JSON.parse(raw): structuredClone(defaultDoc);}catch{return structuredClone(defaultDoc)}}
+    function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(doc));}
+
+    const inputs={
+      title:$('#f-title'), subtitle:$('#f-subtitle'), lead:$('#f-lead'),
+      i_name:$('#i-name'), i_image:$('#i-image'), i_caption:$('#i-caption'), i_born:$('#i-born'), i_residence:$('#i-residence'), i_occupation:$('#i-occupation'), i_knownfor:$('#i-knownfor'), i_years:$('#i-years'), i_website:$('#i-website')
+    };
+
+    function hydrateEditors(){
+      inputs.title.value=doc.title||''; inputs.subtitle.value=doc.subtitle||''; inputs.lead.value=doc.lead||'';
+      inputs.i_name.value=doc.infobox.name||''; inputs.i_image.value=doc.infobox.image||''; inputs.i_caption.value=doc.infobox.caption||'';
+      inputs.i_born.value=doc.infobox.born||''; inputs.i_residence.value=doc.infobox.residence||''; inputs.i_occupation.value=doc.infobox.occupation||'';
+      inputs.i_knownfor.value=doc.infobox.knownFor||''; inputs.i_years.value=doc.infobox.yearsActive||''; inputs.i_website.value=doc.infobox.website||'';
+      renderSectionsEditor(); renderRefsEditor(); updateTone();
+    }
+
+    function on(el,ev,fn){el.addEventListener(ev,fn)}
+
+    on(inputs.title,'input',e=>{doc.title=e.target.value; save(); updateTone();});
+    on(inputs.subtitle,'input',e=>{doc.subtitle=e.target.value; save();});
+    on(inputs.lead,'input',e=>{doc.lead=e.target.value; save(); updateTone();});
+
+    const map={i_name:'name',i_image:'image',i_caption:'caption',i_born:'born',i_residence:'residence',i_occupation:'occupation',i_knownfor:'knownFor',i_years:'yearsActive',i_website:'website'};
+    for(const k in map){ on(inputs[k],'input',e=>{doc.infobox[map[k]]=e.target.value; save();}); }
+
+    function updateTone(){
+      const text=(doc.title+'\\n'+doc.lead+'\\n'+doc.sections.map(s=>s.content).join('\\n')).toLowerCase();
+      const iwords=(text.match(/\\b(i|me|my|mine|myself)\\b/g)||[]).length;
+      const sups=(text.match(/\\b(best|greatest|amazing|unparalleled|extraordinary|unique|incredible|outstanding)\\b/g)||[]).length;
+      const excl=((doc.title+doc.lead+doc.sections.map(s=>s.content).join(' ')).match(/!/g)||[]).length;
+      $('#m-first').textContent=iwords; $('#m-super').textContent=sups; $('#m-excl').textContent=excl;
+    }
+
+    function renderSectionsEditor(){
+      const wrap=$('#sections'); wrap.innerHTML='';
+      doc.sections.forEach((s,idx)=>{
+        const box=document.createElement('div'); box.className='card'; box.style.padding='12px';
+        box.innerHTML=`
+          <div class="row space mb"><label style="flex:1"><span class="label">Section ${idx+1} heading</span>
+            <input value="${esc(s.heading)}"/></label>
+            <button class="btn danger small">Remove</button>
+          </div>
+          <label><span class="label">Content (supports [1] style citations)</span>
+            <textarea class="font-mono">${esc(s.content)}</textarea>
+          </label>`;
+        const inp=$('input',box), ta=$('textarea',box), btn=$('button',box);
+        on(inp,'input',e=>{s.heading=e.target.value; save(); updateTone();});
+        on(ta,'input',e=>{s.content=e.target.value; save(); updateTone();});
+        on(btn,'click',()=>{doc.sections=doc.sections.filter(x=>x.id!==s.id); save(); renderSectionsEditor(); updateTone();});
+        wrap.appendChild(box);
+      });
+    }
+
+    on($('#btn-add-sec'),'click',()=>{doc.sections.push({id:id(),heading:'New section',content:''}); save(); renderSectionsEditor();});
+
+    function renderRefsEditor(){
+      const wrap=$('#refs'); wrap.innerHTML='';
+      doc.references.forEach((r,i)=>{
+        const box=document.createElement('div'); box.className='card'; box.style.padding='12px';
+        box.innerHTML=`
+          <div class="small muted mb">[${i+1}]</div>
+          <label><span class="label">Title / description</span><input value="${esc(r.title||'')}"/></label>
+          <div class="row" style="gap:12px">
+            <label style="flex:1"><span class="label">Date</span><input type="date" value="${esc(r.date||'')}"/></label>
+            <label style="flex:1"><span class="label">URL (optional)</span><input placeholder="https://..." value="${esc(r.url||'')}"/></label>
+          </div>
+          <label><span class="label">Note (context)</span><input value="${esc(r.note||'')}"/></label>
+          <div class="row space"><button class="btn small" data-insert>Insert [${i+1}] at cursor</button>
+          <button class="btn small danger" data-remove>Remove reference</button></div>`;
+        const [t,d,u,n]= $$('input',box);
+        const btnIns=$('[data-insert]',box); const btnDel=$('[data-remove]',box);
+        on(t,'input',e=>{r.title=e.target.value; save();});
+        on(d,'input',e=>{r.date=e.target.value; save();});
+        on(u,'input',e=>{r.url=e.target.value; save();});
+        on(n,'input',e=>{r.note=e.target.value; save();});
+        on(btnDel,'click',()=>{doc.references=doc.references.filter(x=>x.id!==r.id); save(); renderRefsEditor();});
+        on(btnIns,'click',()=>insertCitation(i+1));
+        wrap.appendChild(box);
+      });
+    }
+
+    on($('#btn-add-ref'),'click',()=>{doc.references.push({id:id(),title:'',date:'',url:'',note:''}); save(); renderRefsEditor();});
+
+    function insertCitation(n){
+      const el=document.activeElement; const marker=` [${n}]`;
+      if(el && el.tagName==='TEXTAREA'){
+        const start=el.selectionStart||el.value.length; const end=el.selectionEnd||start;
+        el.value=el.value.slice(0,start)+marker+el.value.slice(end);
+        el.dispatchEvent(new Event('input',{bubbles:true}));
+        el.focus(); el.selectionStart=el.selectionEnd=start+marker.length;
+      } else { navigator.clipboard&&navigator.clipboard.writeText(marker); alert(`Copied ${marker}. Paste it where needed.`); }
+    }
+
+    on($('#btn-insert-cite'),'click',()=>{
+      const modal=$('#modal'), body=$('#modal-body'); body.innerHTML='';
+      doc.references.forEach((r,i)=>{
+        const row=document.createElement('button'); row.className='btn'; row.style.display='block'; row.style.width='100%'; row.style.textAlign='left'; row.style.marginBottom='6px';
+        row.innerHTML=`<div><b>[${i+1}]</b> ${esc(r.title||('Source '+(i+1)))}</div><div class="small muted">${esc(r.date||'')} ${esc(r.url||'')}</div>`;
+        on(row,'click',()=>{insertCitation(i+1); modal.classList.remove('open');});
+        body.appendChild(row);
+      });
+      modal.classList.add('open');
+    });
+    document.addEventListener('click', (e)=>{ if(e.target && e.target.id==='modal') e.target.classList.remove('open'); });
+    document.getElementById('modal-close').addEventListener('click', ()=> document.getElementById('modal').classList.remove('open'));
+
+    function linkifyCitations(text,max){
+      return esc(text||'').replace(/\\[(\\d+)\\]/g,(m,n)=>{const i=Number(n); if(!i||i<1||i>max) return m; return `<sup><a class="link" href="#ref-${i}">[${i}]</a></sup>`;});
+    }
+
+    function renderPreview(){
+      document.getElementById('pv-title').textContent=doc.title||'Untitled';
+      document.getElementById('pv-subtitle').textContent=doc.subtitle||'';
+      const toc=doc.sections.map((s,i)=>`<li><a class="link" href="#sec-${fslug(s.heading)}">${i+1}. ${esc(s.heading||'Untitled section')}</a></li>`).join('');
+      document.getElementById('pv-toc').innerHTML=doc.sections.length?`<div style="font-weight:600;margin-bottom:6px">Contents</div><ol class="list">${toc}</ol>`:'';
+      const ib=doc.infobox; const hasImg=ib.image && ib.image.trim()!=='';
+      document.getElementById('pv-infobox').innerHTML=`<div style="text-align:center;font-weight:600;border-bottom:1px solid var(--border);padding:6px">${esc(ib.name||'Infobox person')}</div>
+        ${hasImg?`<figure style="padding:8px;border-bottom:1px solid var(--border)"><img src="${esc(ib.image)}" alt="${esc(ib.caption||ib.name||'')}" style="max-height:220px;display:block;margin:0 auto;object-fit:contain"/>${ib.caption?`<figcaption class="small muted" style="margin-top:6px">${esc(ib.caption)}</figcaption>`:''}</figure>`:''}
+        <dl class="small" style="padding:8px;display:grid;grid-template-columns:1fr 2fr;gap:6px">
+          ${ib.born?`<dt style="font-weight:600">Born</dt><dd>${esc(ib.born)}</dd>`:''}
+          ${ib.residence?`<dt style="font-weight:600">Residence</dt><dd>${esc(ib.residence)}</dd>`:''}
+          ${ib.occupation?`<dt style="font-weight:600">Occupation</dt><dd>${esc(ib.occupation)}</dd>`:''}
+          ${ib.knownFor?`<dt style="font-weight:600">Known for</dt><dd>${esc(ib.knownFor)}</dd>`:''}
+          ${ib.yearsActive?`<dt style="font-weight:600">Years active</dt><dd>${esc(ib.yearsActive)}</dd>`:''}
+          ${ib.website?`<dt style="font-weight:600">Website</dt><dd><a class="link" target="_blank" rel="noreferrer" href="${nurl(ib.website)}">${esc(ib.website)}</a></dd>`:''}
+        </dl>`;
+      document.getElementById('pv-lead').innerHTML=linkifyCitations(doc.lead, doc.references.length);
+      const wrap=document.getElementById('pv-sections'); wrap.innerHTML='';
+      doc.sections.forEach(s=>{
+        const sec=document.createElement('section'); sec.className='mb';
+        sec.innerHTML=`<h2 id="sec-${fslug(s.heading)}" style="font-size:18px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:4px">${esc(s.heading||'')}</h2>
+          <div style="margin-top:6px">${linkifyCitations(s.content, doc.references.length)}</div>`;
+        wrap.appendChild(sec);
+      });
+      const refs=doc.references.map((r,i)=>`<li id="ref-${i+1}"><span>${r.url?`<a class="link" target="_blank" rel="noreferrer" href="${nurl(r.url)}">${esc(r.title||('Source '+(i+1)))}</a>`:esc(r.title||('Source '+(i+1)))}${r.date?` <span class="muted">— ${esc(r.date)}</span>`:''}</span>${r.note?`<div class="small">${esc(r.note)}</div>`:''}</li>`).join('');
+      document.getElementById('pv-refs').innerHTML = `<h2 style="font-size:18px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:4px">References</h2><ol class="list">${refs}</ol>`;
+    }
+
+    function exportHTML(){
+      renderPreview();
+      const page=document.getElementById('wiki-page').outerHTML;
+      const css=document.querySelector('style').innerHTML;
+      const html=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>${esc(doc.title)} — Personal Wikipedia</title>
+      <style>${css}</style></head><body>${page}</body></html>`;
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fslug(doc.title)+'.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('btn-export-json').addEventListener('click',()=>{
+      const blob=new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fslug(doc.title)+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('btn-export-html').addEventListener('click',exportHTML);
+    document.getElementById('btn-import').addEventListener('click',()=>document.getElementById('import-file').click());
+    document.getElementById('import-file').addEventListener('change',e=>{
+      const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader();
+      r.onload=()=>{try{doc=JSON.parse(String(r.result)); save(); hydrateEditors(); alert('Imported!');}catch{alert('Invalid JSON');}};
+      r.readAsText(f); e.target.value='';
+    });
+
+    function setTab(name){
+      document.getElementById('panel-edit').style.display = (name==='edit')?'grid':'none';
+      document.getElementById('panel-preview').style.display=(name==='preview')?'block':'none';
+      if(name==='preview') renderPreview();
+    }
+    document.getElementById('btn-edit').addEventListener('click',()=>setTab('edit'));
+    document.getElementById('btn-preview').addEventListener('click',()=>setTab('preview'));
+
+    hydrateEditors(); setTab('edit');
+  })();
+  </script>
+</body>
+</html>
