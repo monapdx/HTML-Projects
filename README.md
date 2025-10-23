@@ -31,55 +31,28 @@ Below is an auto‑generated index from the current files. If a project is missi
 
 | Project | Entry File | Summary |
 |---|---|---|
-| `HTML-Projects` | `HTML-Projects/city-builder.html` | **Cozy Pixel City** — — |
-| `HTML-Projects/city-builder.html` | `HTML-Projects/city-builder.html` | **Cozy Pixel City** — — |
-| `HTML-Projects/demos` | `HTML-Projects/demos/cookbook-formatter.html` | **Kindle Cookbook Formatter** — KINDLE COOKBOOK FORMATTER |
-| `HTML-Projects/demos/cookbook-formatter.html` | `HTML-Projects/demos/cookbook-formatter.html` | **Kindle Cookbook Formatter** — KINDLE COOKBOOK FORMATTER |
-| `HTML-Projects/demos/dictionary.html` | `HTML-Projects/demos/dictionary.html` | **dictionary.html** — — |
-| `HTML-Projects/demos/empty-tag-generator.html` | `HTML-Projects/demos/empty-tag-generator.html` | **Merged Tag Generator** — — |
-| `HTML-Projects/demos/goal-tracker.html` | `HTML-Projects/demos/goal-tracker.html` | **Goal Progress Tracker** — Goal Progress Tracker |
-| `HTML-Projects/demos/html5-quiz.html` | `HTML-Projects/demos/html5-quiz.html` | **Html5 Tags Quiz** — HTML5 ELEMENT QUIZ |
-| `HTML-Projects/demos/list-maker.html` | `HTML-Projects/demos/list-maker.html` | **Simple Shopping List App** — LIST GENERATOR |
-| `HTML-Projects/demos/movie-search.html` | `HTML-Projects/demos/movie-search.html` | **Movie Info** — Movie Information |
-| `HTML-Projects/demos/notes.html` | `HTML-Projects/demos/notes.html` | **notes.html** — — |
-| `HTML-Projects/demos/philosophy-quiz.html` | `HTML-Projects/demos/philosophy-quiz.html` | **Which Philosophical Movements Align With You?** — Which Philosophical Movements Align With You? |
-| `HTML-Projects/demos/pixel-art-draw.html` | `HTML-Projects/demos/pixel-art-draw.html` | **Pixel Art Drawing App** — Pixel Art Drawing App |
-| `HTML-Projects/demos/qr-codes.html` | `HTML-Projects/demos/qr-codes.html` | **qr-codes.html** — — |
-| `HTML-Projects/demos/quote-image-generator.html` | `HTML-Projects/demos/quote-image-generator.html` | **Quote Graphic Generator** — — |
-| `HTML-Projects/demos/random-palette.html` | `HTML-Projects/demos/random-palette.html` | **Random Color Palette Generator** — Random Color Palette Generator |
-| `HTML-Projects/demos/rhymes.html` | `HTML-Projects/demos/rhymes.html` | **Rhyme Finder · Datamuse API** — — |
-| `HTML-Projects/demos/sms-templates.html` | `HTML-Projects/demos/sms-templates.html` | **SMS Templates** — — |
-| `HTML-Projects/demos/table-generator.html` | `HTML-Projects/demos/table-generator.html` | **Editable Table Generator** — — |
-| `HTML-Projects/demos/thesaurus.html` | `HTML-Projects/demos/thesaurus.html` | **thesaurus.html** — — |
-| `HTML-Projects/demos/voice-record.html` | `HTML-Projects/demos/voice-record.html` | **Voice Memo Recorder** — — |
-| `HTML-Projects/dictionary.html` | `HTML-Projects/dictionary.html` | **dictionary.html** — — |
-| `HTML-Projects/empty-tag-generator.html` | `HTML-Projects/empty-tag-generator.html` | **Merged Tag Generator** — — |
-| `HTML-Projects/goal-tracker.html` | `HTML-Projects/goal-tracker.html` | **Goal Progress Tracker** — Goal Progress Tracker |
-| `HTML-Projects/html5-quiz.html` | `HTML-Projects/html5-quiz.html` | **Html5 Tags Quiz** — HTML5 ELEMENT QUIZ |
-| `HTML-Projects/kindle-cookbooks` | `HTML-Projects/kindle-cookbooks/formatter.html` | **Kindle Cookbook Formatter** — KINDLE COOKBOOK FORMATTER |
-| `HTML-Projects/kindle-cookbooks/demo` | `HTML-Projects/kindle-cookbooks/demo/index.html` | **My Cookbook** — My Cookbook |
-| `HTML-Projects/kindle-cookbooks/demo/index.html` | `HTML-Projects/kindle-cookbooks/demo/index.html` | **My Cookbook** — My Cookbook |
-| `HTML-Projects/kindle-cookbooks/formatter.html` | `HTML-Projects/kindle-cookbooks/formatter.html` | **Kindle Cookbook Formatter** — KINDLE COOKBOOK FORMATTER |
-| `HTML-Projects/list-maker.html` | `HTML-Projects/list-maker.html` | **Simple Shopping List App** — LIST GENERATOR |
-| `HTML-Projects/movie-search.html` | `HTML-Projects/movie-search.html` | **Movie Info** — Movie Information |
-| `HTML-Projects/notes.html` | `HTML-Projects/notes.html` | **notes.html** — — |
-| `HTML-Projects/philosophy-quiz.html` | `HTML-Projects/philosophy-quiz.html` | **Which Philosophical Movements Align With You?** — Which Philosophical Movements Align With You? |
-| `HTML-Projects/pixel-art-draw.html` | `HTML-Projects/pixel-art-draw.html` | **Pixel Art Drawing App** — Pixel Art Drawing App |
-| `HTML-Projects/poetry-grid` | `HTML-Projects/poetry-grid/index.html` | **Poetry Grid Helper** — — |
-| `HTML-Projects/poetry-grid/index.html` | `HTML-Projects/poetry-grid/index.html` | **Poetry Grid Helper** — — |
-| `HTML-Projects/poetry-grid/square-poem-generator.html` | `HTML-Projects/poetry-grid/square-poem-generator.html` | **Word Grid** — Word Grid Game |
-| `HTML-Projects/qr-codes.html` | `HTML-Projects/qr-codes.html` | **qr-codes.html** — — |
-| `HTML-Projects/quote-image-generator.html` | `HTML-Projects/quote-image-generator.html` | **Quote Graphic Generator** — — |
-| `HTML-Projects/random-palette.html` | `HTML-Projects/random-palette.html` | **Random Color Palette Generator** — Random Color Palette Generator |
-| `HTML-Projects/rhymes.html` | `HTML-Projects/rhymes.html` | **Rhyme Finder · Datamuse API** — — |
-| `HTML-Projects/sms-templates.html` | `HTML-Projects/sms-templates.html` | **SMS Templates** — — |
-| `HTML-Projects/svg/demo` | `HTML-Projects/svg/demo/index.html` | **All Animated Loops** — Animated SVGs (Looped) |
-| `HTML-Projects/svg/demo/index.html` | `HTML-Projects/svg/demo/index.html` | **All Animated Loops** — Animated SVGs (Looped) |
-| `HTML-Projects/table-generator.html` | `HTML-Projects/table-generator.html` | **Editable Table Generator** — — |
-| `HTML-Projects/thesaurus.html` | `HTML-Projects/thesaurus.html` | **thesaurus.html** — — |
-| `HTML-Projects/voice-record.html` | `HTML-Projects/voice-record.html` | **Voice Memo Recorder** — — |
-| `HTML-Projects/wiki` | `HTML-Projects/wiki/personal-wikipedia.html` | **Write Your Own Wikipedia Page** — — |
-| `HTML-Projects/wiki/personal-wikipedia.html` | `HTML-Projects/wiki/personal-wikipedia.html` | **Write Your Own Wikipedia Page** — — |
+| `HTML-Projects` | `HTML-Projects/city-builder.html` | Ready-to-play city builder game in old school pixel art style. |
+| `HTML-Projects/demos` | `HTML-Projects/demos/cookbook-formatter.html` | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
+| `HTML-Projects/demos/dictionary.html` | `HTML-Projects/demos/dictionary.html` | Lookup words in the Merriam-Webster dictionary. |
+| `HTML-Projects/demos/empty-tag-generator.html` | `HTML-Projects/demos/empty-tag-generator.html` | Generate empty HTML tags and add CSS classes (optional). Supports nested tags. |
+| `HTML-Projects/demos/goal-tracker.html` | `HTML-Projects/demos/goal-tracker.html` | Track your savings towards large purchases using this goal tracker. |
+| `HTML-Projects/demos/html5-quiz.html` | `HTML-Projects/demos/html5-quiz.html` | Quiz that can be modified with any set of correct answers and customized to your needs. |
+| `HTML-Projects/demos/list-maker.html` | `HTML-Projects/demos/list-maker.html` | Generate to-do lists, export to HTML. |
+| `HTML-Projects/demos/movie-search.html` | `HTML-Projects/demos/movie-search.html` | Search for movies. |
+| `HTML-Projects/demos/notes.html` | `HTML-Projects/demos/notes.html` | Save text notes in the browser. |
+| `HTML-Projects/demos/philosophy-quiz.html` | `HTML-Projects/demos/philosophy-quiz.html` | Which Philosophical Movements Align With You? |
+| `HTML-Projects/demos/pixel-art-draw.html` | `HTML-Projects/demos/pixel-art-draw.html` | Canvas for drawing pixel art. |
+| `HTML-Projects/demos/qr-codes.html` | `HTML-Projects/demos/qr-codes.html` | URL to QR Code generator. |
+| `HTML-Projects/demos/quote-image-generator.html` | `HTML-Projects/demos/quote-image-generator.html` | Generate quote graphics to share on social media. Choose your gradient colors, font, and enter your favorite quote. |
+| `HTML-Projects/demos/random-palette.html` | `HTML-Projects/demos/random-palette.html` | Generate random color palettes with hex codes. |
+| `HTML-Projects/demos/rhymes.html` | `HTML-Projects/demos/rhymes.html` | Rhyming word finder powered by Datamuse API. |
+| `HTML-Projects/demos/sms-templates.html` | `HTML-Projects/demos/sms-templates.html` | Save frequently used text messages and easily copy and paste them into Google Voice while on desktop. |
+| `HTML-Projects/demos/table-generator.html` | `HTML-Projects/demos/table-generator.html` | Generates editable HTML tables with custom headings and click-to-edit in place cells. |
+| `HTML-Projects/demos/thesaurus.html` | `HTML-Projects/demos/thesaurus.html` | Lookup word synonyms. |
+| `HTML-Projects/demos/voice-record.html` | `HTML-Projects/demos/voice-record.html` | Record voice notes and download them in the browser. |
+| `HTML-Projects/poetry-grid` | `HTML-Projects/poetry-grid/index.html` | Try to write poems that read exactly the same horizontally and vertically! |
+| `HTML-Projects/svg/demo` | `HTML-Projects/svg/demo/index.html` | Take screenshots of charts or graphs, then have ChatGPT turn them into animated SVGs. |
+| `HTML-Projects/wiki` | `HTML-Projects/wiki/personal-wikipedia.html` | Wikipedia-style editor for writing your own Wikipedia page. |
 
 > TIP: If you rename your main HTML file to `index.html` and include a `<title>`, this index will pick it up automatically next time it’s regenerated.
 
