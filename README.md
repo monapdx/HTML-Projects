@@ -31,8 +31,8 @@ Below is an auto‑generated index from the current files. If a project is missi
 
 | Project | Entry File | Summary |
 |---|---|---|
-| `City Builder` | Ready-to-play city builder game in old school pixel art style. |
-| `Kindle Cookbook Formatter` | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
+| `City Builder` | `HTML-Projects/demos/city-builder.html` |Ready-to-play city builder game in old school pixel art style. |
+| `Kindle Cookbook Formatter` | `HTML-Projects/demos/cookbook-formatter.html` | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
 | `Dictionary Lookup` | `HTML-Projects/demos/dictionary.html` | Lookup words in the Merriam-Webster dictionary. |
 | `Empty HTML Tag Generator` | `HTML-Projects/demos/empty-tag-generator.html` | Generate empty HTML tags and add CSS classes (optional). Supports nested tags. |
 | `Goal Tracker` | `HTML-Projects/demos/goal-tracker.html` | Track your savings towards large purchases using this goal tracker. |
