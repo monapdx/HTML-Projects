@@ -34,28 +34,28 @@ Below is an auto‑generated index from the current files. If a project is missi
 
 | Project | Entry File | Summary |
 |---|---|---|
-| `City Builder` | `HTML-Projects/demos/city-builder.html` |Ready-to-play city builder game in old school pixel art style. |
-| `Kindle Cookbook Formatter` | `HTML-Projects/demos/cookbook-formatter.html` | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
-| `Dictionary Lookup` | `HTML-Projects/demos/dictionary.html` | Lookup words in the Merriam-Webster dictionary. |
-| `Empty HTML Tag Generator` | `HTML-Projects/demos/empty-tag-generator.html` | Generate empty HTML tags and add CSS classes (optional). Supports nested tags. |
-| `Goal Tracker` | `HTML-Projects/demos/goal-tracker.html` | Track your savings towards large purchases using this goal tracker. |
-| `Quiz` | `HTML-Projects/demos/html5-quiz.html` | Quiz that can be modified with any set of correct answers and customized to your needs. |
-| `List Generator` | `HTML-Projects/demos/list-maker.html` | Generate to-do lists, export to HTML. |
-| `Movie Search` | `HTML-Projects/demos/movie-search.html` | Search for movies. |
-| `Note Saver` | `HTML-Projects/demos/notes.html` | Save text notes in the browser. |
-| `Philosophical Alignment Test` | `HTML-Projects/demos/philosophy-quiz.html` | Which Philosophical Movements Align With You? |
-| `Pixel Art Drawboard` | `HTML-Projects/demos/pixel-art-draw.html` | Canvas for drawing pixel art. |
-| `URL to QR Code` | `HTML-Projects/demos/qr-codes.html` | URL to QR Code generator. |
-| `Quote Graphic Generator` | `HTML-Projects/demos/quote-image-generator.html` | Generate quote graphics to share on social media. Choose your gradient colors, font, and enter your favorite quote. |
-| `Random Color Palettes` | `HTML-Projects/demos/random-palette.html` | Generate random color palettes with hex codes. |
-| `Rhyme Search` | `HTML-Projects/demos/rhymes.html` | Rhyming word finder powered by Datamuse API. |
-| `SMS Templates` | `HTML-Projects/demos/sms-templates.html` | Save frequently used text messages and easily copy and paste them into Google Voice while on desktop. |
-| `Editable HTML Table Generator` | `HTML-Projects/demos/table-generator.html` | Generates editable HTML tables with custom headings and click-to-edit in place cells. |
-| `Synonym Lookup` | `HTML-Projects/demos/thesaurus.html` | Lookup word synonyms. |
-| `Voice Recorder` | `HTML-Projects/demos/voice-record.html` | Record voice notes and download them in the browser. |
-| `Poetry Grid Helper` | `HTML-Projects/poetry-grid/index.html` | Try to write poems that read exactly the same horizontally and vertically! |
-| `Screenshot 2 SVG` | `HTML-Projects/svg/demo/index.html` | Take screenshots of charts or graphs, then have ChatGPT turn them into animated SVGs. |
-| `Wikipedia Editor` | `HTML-Projects/wiki/personal-wikipedia.html` | Wikipedia-style editor for writing your own Wikipedia page. |
+| `City Builder` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/city-builder.png" alt="Humor DNA Banner" width="345"> |Ready-to-play city builder game in old school pixel art style. |
+| `Kindle Cookbook Formatter` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/cookbook-formatter.png" alt="" width="345"> | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
+| `Dictionary Lookup` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/dictionary.png" alt="" width="345"> | Lookup words in the Merriam-Webster dictionary. |
+| `Empty HTML Tag Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/empty-tag-generator.png" alt="" width="345"> | Generate empty HTML tags and add CSS classes (optional). Supports nested tags. |
+| `Goal Tracker` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/goal-tracker.png" alt="" width="345"> | Track your savings towards large purchases using this goal tracker. |
+| `Quiz` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/html5-quiz.png" alt="" width="345"> | Quiz that can be modified with any set of correct answers and customized to your needs. |
+| `List Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/list-maker.png" alt="" width="345"> | Generate to-do lists, export to HTML. |
+| `Movie Search` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/movie-search.png" alt="" width="345"> | Search for movies. |
+| `Note Saver` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/notes.png" alt="" width="345"> | Save text notes in the browser. |
+| `Philosophical Alignment Test` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/philosophy-quiz.png" alt="" width="340"> | Which Philosophical Movements Align With You? |
+| `Pixel Art Drawboard` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/pixel-art-draw.png" alt="" width="345"> | Canvas for drawing pixel art. |
+| `URL to QR Code` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/qr-codes.png" alt="" width="345"> | URL to QR Code generator. |
+| `Quote Graphic Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/quote-image-generator.png" alt="" width="345"> | Generate quote graphics to share on social media. Choose your gradient colors, font, and enter your favorite quote. |
+| `Random Color Palettes` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/random-color-palette.png" alt="" width="345"> | Generate random color palettes with hex codes. |
+| `Rhyme Search` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/rhymes.png" alt="" width="345"> | Rhyming word finder powered by Datamuse API. |
+| `SMS Templates` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/sms-templates.png" alt="" width="345"> | Save frequently used text messages and easily copy and paste them into Google Voice while on desktop. |
+| `Editable HTML Table Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/table-generator.png" alt="" width="345"> | Generates editable HTML tables with custom headings and click-to-edit in place cells. |
+| `Synonym Lookup` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/synonym-lookup.png" alt="" width="345"> | Lookup word synonyms. |
+| `Voice Recorder` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/voice-record.png" alt="" width="345"> | Record voice notes and download them in the browser. |
+| `Poetry Grid Helper` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Poetry-Grid-Helper-12-17-2024_07_18_AM.png" alt="" width="345"> | Try to write poems that read exactly the same horizontally and vertically! |
+| `Screenshot 2 SVG` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/svg-loops.png" alt="" width="340"> | Take screenshots of charts or graphs, then have ChatGPT turn them into animated SVGs. |
+| `Wikipedia Editor` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Write-Your-Own-Wikipedia-Page-10-22-2025_08_10_PM.png" alt="" width="340"> | Wikipedia-style editor for writing your own Wikipedia page. |
 
 ---
 
