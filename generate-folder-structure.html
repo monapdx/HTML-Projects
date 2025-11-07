@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>File Path Visualizer</title>
+
+<!-- html2canvas for exporting the preview as an image -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    color: #333;
+  }
+  .app {
+    max-width: 1000px;
+    margin: 24px auto;
+    padding: 0 16px 24px;
+  }
+  h1 {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 16px;
+  }
+  .panel {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    padding: 16px 18px;
+  }
+  .panel h2 { margin: 0 0 8px; font-size: 16px; }
+  .panel p { font-size: 13px; color: #666; margin: 0 0 12px; }
+  input[type="text"] {
+    width: 100%; padding: 7px 9px;
+    border: 1px solid #ccc; border-radius: 6px;
+    font-size: 13px; outline: none;
+  }
+  input[type="text"]:focus {
+    border-color: #0074d9;
+    box-shadow: 0 0 0 2px rgba(0,116,217,0.15);
+  }
+  .hint { font-size: 12px; color: #777; margin-top: 8px; }
+
+  /* Export button */
+  .export-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+  #downloadBtn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #0074d9;
+    color: #fff;
+    font-weight: 500;
+  }
+  #downloadBtn:hover {
+    filter: brightness(0.95);
+  }
+
+  #treeContainer {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-height: 220px;
+    background: #fffdf8;
+    overflow: auto;
+    font-size: 14px;
+  }
+  .tree-root ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 18px;
+    border-left: 1px solid #ddd;
+  }
+  .tree-node { position: relative; margin: 2px 0; }
+  .tree-node::before {
+    content: "";
+    position: absolute;
+    left: -17px;
+    top: 15px;
+    width: 16px;
+    height: 1px;
+    background: #ddd;
+  }
+  .node-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: default;
+    padding: 2px 0;
+  }
+  .caret {
+    width: 12px; text-align: center; font-size: 10px; color: #666;
+    user-select: none; transition: transform 0.15s ease-out;
+  }
+  .tree-node.folder.collapsed > ul { display: none; }
+  .tree-node.folder.collapsed .caret { transform: rotate(-90deg); }
+
+  .icon { width: 16px; text-align: center; font-size: 14px; }
+  .folder .name { font-weight: 700; }
+  .file .name { font-weight: 400; }
+  .adder {
+    display: flex; gap: 4px; margin-left: 8px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s ease-out;
+  }
+  .tree-node.folder:hover .adder {
+    opacity: 1; pointer-events: auto;
+  }
+  .adder input { font-size: 12px; padding: 4px 6px; width: 140px; }
+  .root-empty { font-style: italic; color: #777; font-size: 13px; }
+
+  /* While exporting, hide add-inputs so the image is clean */
+  body.exporting .adder {
+    display: none !important;
+  }
+
+  @media (max-width:800px){.layout{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>File Path Visualizer</h1>
+  <div class="layout">
+    <section class="panel">
+      <h2>Add top-level folders</h2>
+      <p>Start by adding a root folder. Hover a folder to add sub-folders or files. Click a folder name to collapse it.</p>
+      <form id="rootForm">
+        <input id="rootFolderInput" type="text"
+               placeholder="Add Folder (e.g. Images)"
+               autocomplete="off" />
+      </form>
+      <div class="hint">
+        Press <strong>Enter</strong> to add folders.  
+        Hover a folder for “Add Sub-Folder” or “Add File”.
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Folder structure preview</h2>
+
+      <div class="export-actions">
+        <button id="downloadBtn" type="button">Download as PNG</button>
+      </div>
+
+      <div id="treeContainer">
+        <div class="root-empty">
+          No folders yet. Add one using the field on the left.
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+let tree = [], idCounter = 1;
+const rootForm = document.getElementById("rootForm");
+const rootInput = document.getElementById("rootFolderInput");
+const treeContainer = document.getElementById("treeContainer");
+const downloadBtn = document.getElementById("downloadBtn");
+
+rootForm.addEventListener("submit", e=>{
+  e.preventDefault();
+  const name=rootInput.value.trim();
+  if(!name)return;
+  tree.push({id:idCounter++,name,type:"folder",children:[]});
+  rootInput.value="";
+  renderTree();
+});
+
+function findNode(id,nodes=tree){
+  for(const n of nodes){
+    if(n.id===id)return n;
+    if(n.type==="folder"){
+      const f=findNode(id,n.children);
+      if(f)return f;
+    }
+  }return null;
+}
+
+function iconForFile(name){
+  const ext=(name.split(".").pop()||"").toLowerCase();
+  const map={
+    jpg:"🖼️",jpeg:"🖼️",png:"🖼️",gif:"🖼️",svg:"🖌️",
+    pdf:"📕",doc:"📄",docx:"📄",txt:"📜",md:"📝",
+    js:"💻",jsx:"💻",ts:"💻",tsx:"💻",py:"🐍",html:"🌐",css:"🎨",
+    zip:"🗜️",rar:"🗜️",csv:"📊",xls:"📊",xlsx:"📊",json:"🧾"
+  };
+  return map[ext]||"📄";
+}
+
+function renderTree(){
+  treeContainer.innerHTML="";
+  if(!tree.length){
+    const empty=document.createElement("div");
+    empty.className="root-empty";
+    empty.textContent="No folders yet. Add one using the field on the left.";
+    treeContainer.appendChild(empty);
+    return;
+  }
+  const rootDiv=document.createElement("div");
+  rootDiv.className="tree-root";
+  rootDiv.appendChild(buildList(tree));
+  treeContainer.appendChild(rootDiv);
+}
+
+function buildList(nodes){
+  const ul=document.createElement("ul");
+  nodes.forEach(n=>{
+    const li=document.createElement("li");
+    li.className=`tree-node ${n.type}`;
+    li.dataset.id=n.id;
+
+    const row=document.createElement("div");
+    row.className="node-row";
+
+    const caret=document.createElement("span");
+    caret.className="caret";
+    caret.textContent=n.type==="folder"?"▾":"";
+    row.appendChild(caret);
+
+    const icon=document.createElement("span");
+    icon.className="icon";
+    icon.textContent=n.type==="folder"?"📁":iconForFile(n.name);
+    row.appendChild(icon);
+
+    const name=document.createElement("span");
+    name.className="name";
+    name.textContent=n.name;
+    row.appendChild(name);
+
+    if(n.type==="folder"){
+      row.addEventListener("click",e=>{
+        if(e.target.closest(".adder"))return;
+        li.classList.toggle("collapsed");
+      });
+
+      const adder=document.createElement("div");
+      adder.className="adder";
+
+      const subF=document.createElement("form");
+      const subI=document.createElement("input");
+      subI.placeholder="Add Sub-Folder";
+      subF.appendChild(subI);
+      subF.onsubmit=e=>{
+        e.preventDefault();
+        const v=subI.value.trim();
+        if(!v)return;
+        const t=findNode(n.id);
+        t.children.push({id:idCounter++,name:v,type:"folder",children:[]});
+        renderTree();
+      };
+
+      const fileF=document.createElement("form");
+      const fileI=document.createElement("input");
+      fileI.placeholder="Add File";
+      fileF.appendChild(fileI);
+      fileF.onsubmit=e=>{
+        e.preventDefault();
+        const v=fileI.value.trim();
+        if(!v)return;
+        const t=findNode(n.id);
+        t.children.push({id:idCounter++,name:v,type:"file",children:[]});
+        renderTree();
+      };
+
+      adder.append(subF,fileF);
+      row.appendChild(adder);
+    }
+
+    li.appendChild(row);
+    if(n.children?.length) li.appendChild(buildList(n.children));
+    ul.appendChild(li);
+  });
+  return ul;
+}
+
+/* Export as PNG using html2canvas */
+downloadBtn.addEventListener("click", () => {
+  if (!window.html2canvas) {
+    alert("html2canvas failed to load.");
+    return;
+  }
+  // Hide adders for a clean capture
+  document.body.classList.add("exporting");
+
+  // Give the layout a tick to update
+  setTimeout(() => {
+    html2canvas(treeContainer, {
+      backgroundColor: "#fffdf8",
+      scale: 2      // higher-res export
+    }).then(canvas => {
+      document.body.classList.remove("exporting");
+      const link = document.createElement("a");
+      link.download = "folder-structure.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }).catch(() => {
+      document.body.classList.remove("exporting");
+      alert("Something went wrong while generating the image.");
+    });
+  }, 50);
+});
+</script>
+</body>
+</html>
