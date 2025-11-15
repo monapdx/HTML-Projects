@@ -56,8 +56,8 @@ Below is an auto‑generated index from the current files. If a project is missi
 | `Poetry Grid Helper` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Poetry-Grid-Helper-12-17-2024_07_18_AM.png" alt="" width="345"> | Try to write poems that read exactly the same horizontally and vertically! |
 | `Screenshot 2 SVG` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/svg-loops.png" alt="" width="340"> | Take screenshots of charts or graphs, then have ChatGPT turn them into animated SVGs. |
 | `Wikipedia Editor` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Write-Your-Own-Wikipedia-Page-10-22-2025_08_10_PM.png" alt="" width="340"> | Wikipedia-style editor for writing your own Wikipedia page. |
-| `Offline GPT` | <img src="" alt="" width="340"> | Load your conversations.json file from ChatGPT export and browse chats locally/offline. |
-| `Writing Deadline` | <img src="" alt="" width="340"> | Deadline countdown, word limit enforced and content saved in textarea. |
+| `Offline GPT` | <img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/img/offline-GPT.png" alt="" width="420"> | Load your conversations.json file from ChatGPT export and browse chats locally/offline. |
+| `Writing Deadline` | <img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/img/writing-contest-helper.png" alt="" width="444"> | Deadline countdown, word limit enforced and content saved in textarea. |
 
 
 ## How To Customize
