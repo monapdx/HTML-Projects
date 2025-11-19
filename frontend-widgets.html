@@ -1,0 +1,299 @@
+<style>
+/* ----------------------- Modern Responsive Tables ----------------------- */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  border: 1px solid #2e2e36;
+  background: #151518;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+}
+
+/* Base table */
+table.pretty {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+  font-family: system-ui, sans-serif;
+  color: #e5e5e7;
+}
+
+table.pretty thead {
+  background: linear-gradient(90deg, #e91e63, #ffb300);
+  color: #1a1a1c;
+}
+
+table.pretty th {
+  padding: 0.9rem 0.75rem;
+  font-weight: 700;
+  text-align: left;
+  font-size: 0.97rem;
+  letter-spacing: 0.3px;
+}
+
+table.pretty td {
+  padding: 0.8rem 0.75rem;
+  border-top: 1px solid #2b2b31;
+  font-size: 0.92rem;
+}
+
+/* Zebra rows */
+table.pretty tbody tr:nth-child(odd) {
+  background: #1a1a1f;
+}
+table.pretty tbody tr:nth-child(even) {
+  background: #141418;
+}
+
+/* Hover effect */
+table.pretty tbody tr:hover {
+  background: #24242c;
+  transition: 0.2s ease;
+}
+
+/* Make URLs and code easier to see */
+table.pretty code {
+  background: #1f1f24;
+  padding: 2px 5px;
+  border-radius: 5px;
+  color: #ffd868;
+  font-size: 0.85rem;
+}
+
+/* ----------------------- Mobile / Narrow Screens ----------------------- */
+@media (max-width: 640px) {
+
+  table.pretty thead {
+    display: none; /* hide header */
+  }
+
+  table.pretty,
+  table.pretty tbody,
+  table.pretty tr,
+  table.pretty td {
+    display: block;
+    width: 100%;
+  }
+
+  table.pretty tr {
+    margin-bottom: 1rem;
+    background: #19191d;
+    border: 1px solid #303038;
+    border-radius: 12px;
+    padding: 0.5rem;
+  }
+
+  table.pretty td {
+    border: none;
+    padding: 0.55rem 0.8rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+
+  /* label before each cell */
+  table.pretty td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #e91e63;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+</style>
+
+<div class="table-wrap">
+  <table class="pretty">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="File">Contest-Deadline/countdown-timer</td>
+        <td data-label="Description">Standalone countdown page targeting Nov 14, 2025, 23:59 EST, showing full time breakdown.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/deadline-template-builder</td>
+        <td data-label="Description">Form-based Deadline Template Builder that generates a full contest deadline page with preview and download.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/textarea-limit</td>
+        <td data-label="Description">Textarea with a 3,000-word limit and a live counter.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/textarea-magic</td>
+        <td data-label="Description">Short Fiction Contest helper with autosave, 3,000-word max, and deadline countdown.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/textarea-save</td>
+        <td data-label="Description">Small utility to autosave/restore textareas using localStorage.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/wow-fall-2025-helper</td>
+        <td data-label="Description">WOW! Flash Fiction contest helper with 250–750 word limit, contact fields, preview, and countdown.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Contest-Deadline/writing-deadline</td>
+        <td data-label="Description">Generic writing contest helper template with max-words textarea and countdown.</td>
+      </tr>
+
+      <tr>
+        <td data-label="File">Quiz/countries-of-the-world</td>
+        <td data-label="Description">Typing quiz to name all countries of the world.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/css-color-names</td>
+        <td data-label="Description">Typing quiz for valid CSS named colors.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/css-properties-quiz</td>
+        <td data-label="Description">Typing quiz for CSS properties like border-radius and flex-direction.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/css-quiz</td>
+        <td data-label="Description">15-question intermediate CSS multiple-choice quiz with explanations.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/four-letter-b-words</td>
+        <td data-label="Description">Typing quiz for four-letter words starting with “B.”</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/html-attributes-quiz</td>
+        <td data-label="Description">Typing quiz for HTML attributes.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/periodic-table-of-elements</td>
+        <td data-label="Description">Typing quiz for chemical elements.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/quiz-builder</td>
+        <td data-label="Description">Form-based Quiz Builder that generates downloadable custom quizzes.</td>
+      </tr>
+      <tr>
+        <td data-label="File">Quiz/quiz-template</td>
+        <td data-label="Description">Base template used for quiz-builder output.</td>
+      </tr>
+
+      <tr>
+        <td data-label="File">city-builder</td>
+        <td data-label="Description">React + Tailwind pixel/isometric mini city builder rendered on a canvas.</td>
+      </tr>
+      <tr>
+        <td data-label="File">cookbook-formatter</td>
+        <td data-label="Description">Form for Kindle-style cookbook formatting with linked TOC and recipe sections.</td>
+      </tr>
+      <tr>
+        <td data-label="File">countdown-timer</td>
+        <td data-label="Description">Minimal independent countdown widget for the Nov 14, 2025 deadline.</td>
+      </tr>
+      <tr>
+        <td data-label="File">dictionary</td>
+        <td data-label="Description">Dictionary lookup tool using Merriam-Webster’s Collegiate API.</td>
+      </tr>
+      <tr>
+        <td data-label="File">email-viewer</td>
+        <td data-label="Description">MBOX email viewer with Gmail-style layout, filtering, and search.</td>
+      </tr>
+      <tr>
+        <td data-label="File">empty-tag-generator</td>
+        <td data-label="Description">Bulk HTML tag generator producing custom tags with classes/IDs and nesting.</td>
+      </tr>
+      <tr>
+        <td data-label="File">generate-folder-structure</td>
+        <td data-label="Description">File path visualizer that exports PNG tree diagrams using html2canvas.</td>
+      </tr>
+      <tr>
+        <td data-label="File">goal-tracker</td>
+        <td data-label="Description">Savings goal tracker with product cards, progress, images, and autosave.</td>
+      </tr>
+      <tr>
+        <td data-label="File">html5-quiz</td>
+        <td data-label="Description">Typing quiz for HTML5 elements with circular progress visualization.</td>
+      </tr>
+      <tr>
+        <td data-label="File">index</td>
+        <td data-label="Description">Main index listing every tool/project with descriptions and search.</td>
+      </tr>
+
+      <tr>
+        <td data-label="File">kindle-cookbooks/demo/index</td>
+        <td data-label="Description">Placeholder page for cookbook formatter demo.</td>
+      </tr>
+      <tr>
+        <td data-label="File">kindle-cookbooks/formatter</td>
+        <td data-label="Description">Cookbook formatter (duplicate of root version, organized in subfolder).</td>
+      </tr>
+      <tr>
+        <td data-label="File">kindle-cookbooks/kdp_chef.png</td>
+        <td data-label="Description">Branding image used by Kindle cookbook formatter.</td>
+      </tr>
+
+      <tr>
+        <td data-label="File">list-maker</td>
+        <td data-label="Description">Checklist/list generator with strike-off and export capabilities.</td>
+      </tr>
+      <tr>
+        <td data-label="File">movie-search</td>
+        <td data-label="Description">Movie search tool using OMDb API for posters, plot, credits, and ratings.</td>
+      </tr>
+      <tr>
+        <td data-label="File">notes</td>
+        <td data-label="Description">Local-storage-based notes/snippets manager with copy/delete actions.</td>
+      </tr>
+      <tr>
+        <td data-label="File">offline-GPT</td>
+        <td data-label="Description">Offline viewer for JSON chat exports with sidebar conversation list.</td>
+      </tr>
+      <tr>
+        <td data-label="File">personal-palette</td>
+        <td data-label="Description">Color palette builder that converts hex codes into a visual grid.</td>
+      </tr>
+      <tr>
+        <td data-label="File">philosophy-quiz</td>
+        <td data-label="Description">Philosophical alignment quiz with scoring, sortable results, and summary.</td>
+      </tr>
+      <tr>
+        <td data-label="File">pixel-art-draw</td>
+        <td data-label="Description">32×32 pixel art editor with palette and PNG export.</td>
+      </tr>
+      <tr>
+        <td data-label="File">qr-codes</td>
+        <td data-label="Description">QR code generator using the Qrious library.</td>
+      </tr>
+      <tr>
+        <td data-label="File">quote-image-generator</td>
+        <td data-label="Description">Canvas-based quote image maker with gradient backgrounds and fonts.</td>
+      </tr>
+      <tr>
+        <td data-label="File">random-palette</td>
+        <td data-label="Description">Quick random color palette generator.</td>
+      </tr>
+      <tr>
+        <td data-label="File">rhymes</td>
+        <td data-label="Description">Rhyme finder powered by the Datamuse API.</td>
+      </tr>
+      <tr>
+        <td data-label="File">sms-templates</td>
+        <td data-label="Description">Small utility for managing and copying SMS text templates.</td>
+      </tr>
+      <tr>
+        <td data-label="File">table-generator</td>
+        <td data-label="Description">Responsive grid-based table generator with editable cells.</td>
+      </tr>
+      <tr>
+        <td data-label="File">thesaurus</td>
+        <td data-label="Description">Thesaurus tool using the STANDS4 Synonyms API.</td>
+      </tr>
+      <tr>
+        <td data-label="File">voice-record</td>
+        <td data-label="Description">Web voice recorder using the MediaRecorder API, with WEBM export.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
