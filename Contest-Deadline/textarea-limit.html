@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textarea Word Limit with Word Count</title>
+    <style>
+        .word-count {
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        
+
+        <label for="textarea3">Total Word Count: Max 3000 Words</label><br>
+        <textarea id="textarea3" rows="30" cols="50" data-max-words="3000"></textarea>
+        <div id="count3" class="word-count">Words: 0</div>
+    </form>
+
+    <script>
+        // Function to count words
+        function countWords(text) {
+            return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+
+        // Function to enforce word limit and update word count
+        function enforceWordLimit(event) {
+            const textarea = event.target;
+            const maxWords = parseInt(textarea.getAttribute('data-max-words'), 10);
+            const words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0);
+            const wordCountDisplay = document.querySelector(`#count${textarea.id.slice(-1)}`);
+
+            if (words.length > maxWords) {
+                // Limit the text to the max word count
+                textarea.value = words.slice(0, maxWords).join(' ');
+            }
+
+            // Update the word count display
+            wordCountDisplay.textContent = `Words: ${countWords(textarea.value)}`;
+        }
+
+        // Attach event listeners to each textarea with data-max-words attribute
+        document.querySelectorAll('textarea[data-max-words]').forEach(textarea => {
+            textarea.addEventListener('input', enforceWordLimit);
+        });
+    </script>
+</body>
+</html>

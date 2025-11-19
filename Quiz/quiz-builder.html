@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #0f0f10;
+      color: #f9fafb;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+    @media (min-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .card {
+      background: #18181b;
+      border: 1px solid #27272f;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a1a1aa;
+      margin-bottom: 4px;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #3f3f46;
+      background: #020617;
+      color: #f9fafb;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    textarea {
+      min-height: 80px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #e91e63;
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: #a1a1aa;
+      margin-top: 4px;
+    }
+    .buttons {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button {
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #ec4899, #6366f1);
+      color: white;
+      border-color: #4b5563;
+    }
+    button.secondary {
+      background: #020617;
+      color: #e5e7eb;
+      border-color: #4b5563;
+    }
+    #output-html {
+      min-height: 180px;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Builder</h1>
+    <p>
+      Enter your quiz info below. Click "Generate &amp; Download HTML" to get a standalone quiz
+      file that uses your answers list.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <label for="quiz-title">Quiz title</label>
+        <input type="text" id="quiz-title" placeholder="e.g. Four Letter B Words" />
+
+        <label for="quiz-description" style="margin-top: 10px;">Quiz description</label>
+        <textarea id="quiz-description" placeholder="Short intro or instructions for your quiz."></textarea>
+
+        <label for="quiz-answers" style="margin-top: 10px;">Quiz answers (one per line)</label>
+        <textarea
+          id="quiz-answers"
+          placeholder="BYES&#10;BYRE&#10;BYRL&#10;BYTE"
+        ></textarea>
+        <div class="hint">
+          Each non-empty line becomes an array item in:<br />
+          <code>const wordList = ["answer-one","answer-two",...];</code><br />
+          Matching is case-insensitive in the quiz.
+        </div>
+
+        <div class="buttons">
+          <button id="generate-btn" type="button" class="primary">⬇ Generate &amp; Download HTML</button>
+          <button id="demo-btn" type="button" class="secondary">Fill with demo data</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <label for="output-html">Generated HTML (preview)</label>
+        <textarea id="output-html" readonly></textarea>
+        <div class="hint">
+          You can copy this directly or just use the downloaded file.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function slugify(str) {
+      var s = (str || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      return s || "quiz";
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>\"']/g, function (ch) {
+        switch (ch) {
+          case "&": return "&amp;";
+          case "<": return "&lt;";
+          case ">": return "&gt;";
+          case "\"": return "&quot;";
+          case "'": return "&#39;";
+        }
+      });
+    }
+
+    function buildQuizHtml(title, description, answersText) {
+      // Split answers by line, trim, and drop empties
+      var lines = answersText.split(/\r?\n/);
+      var words = [];
+      for (var i = 0; i < lines.length; i++) {
+        var w = lines[i].trim();
+        if (w.length > 0) {
+          words.push(w);
+        }
+      }
+
+      if (!words.length) {
+        alert("Please enter at least one quiz answer (one per line).");
+        return null;
+      }
+
+      // Build a JS array literal: ["word1","word2"]
+      var items = [];
+      for (var j = 0; j < words.length; j++) {
+        items.push(JSON.stringify(words[j]));
+      }
+      var arrayLiteral = "[" + items.join(",") + "]";
+
+      var safeTitle = escapeHtml(title || "Quiz");
+      var safeDescription = escapeHtml(description || "");
+
+      // Build final HTML string with simple concatenation (no template literals)
+      var html = "";
+      html += "<!DOCTYPE html>\n";
+      html += "<html lang=\"en\">\n";
+      html += "<head>\n";
+      html += "  <meta charset=\"UTF-8\">\n";
+      html += "  <title>" + safeTitle + "</title>\n";
+      html += "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+      html += "  <style>\n";
+      html += "    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');\n";
+      html += "    body { font-family: \"Oswald\", serif; margin: 20px; text-align: center; }\n";
+      html += "    #correct-words { margin-top: 20px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }\n";
+      html += "    #correct-words li { list-style-type: none; margin: 5px; padding: 10px; background-color: #a8e6ce; border-radius: 5px; }\n";
+      html += "    #correct-words li:hover { border: 1px outset #a8e6ce; background-color: #f0fff0; }\n";
+      html += "    #counter { margin-top: 20px; font-size: 1.2em; }\n";
+      html += "    h1 { font-weight: 800; font-style: normal; }\n";
+      html += "    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }\n";
+      html += "    input:focus { outline: none; border-color: blue; box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }\n";
+      html += "    button.answer { margin-top: 10px; width: 100%; background: #007bff; color: #fff; font-size: 16px; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s ease; }\n";
+      html += "    button.answer:hover { background: #0056b3; }\n";
+      html += "  </style>\n";
+      html += "</head>\n";
+      html += "<body>\n";
+      html += "  <h1>" + safeTitle + "</h1>\n";
+      html += "  <p>" + safeDescription + "</p>\n";
+      html += "  <br><br>\n";
+      html += "  <input type=\"text\" id=\"word-input\" placeholder=\"Type your guess...\" autofocus>\n";
+      html += "  <button onclick=\"checkWord()\" class=\"answer\">Submit</button>\n";
+      html += "  <div id=\"counter\">Correct Answers: 0 / " + words.length + "</div>\n";
+      html += "  <div id=\"progress-container\">\n";
+      html += "    <canvas id=\"progress-canvas\" width=\"150\" height=\"150\"></canvas>\n";
+      html += "  </div>\n";
+      html += "  <ul id=\"correct-words\"></ul>\n";
+      html += "  <script>\n";
+      html += "    const wordList = " + arrayLiteral + ";\n";
+      html += "    const normalizedAnswers = new Set(wordList.map(w => w.toLowerCase()));\n";
+      html += "    const foundNormalized = new Set();\n";
+      html += "    const foundDisplay = [];\n";
+      html += "    const totalWords = wordList.length;\n";
+      html += "    function updateCounter() {\n";
+      html += "      const correctCount = foundDisplay.length;\n";
+      html += "      document.getElementById('counter').textContent = 'Correct Answers: ' + correctCount + ' / ' + totalWords;\n";
+      html += "      updateCanvas((correctCount / totalWords) * 100);\n";
+      html += "    }\n";
+      html += "    function checkWord() {\n";
+      html += "      const inputEl = document.getElementById('word-input');\n";
+      html += "      const guess = inputEl.value.trim();\n";
+      html += "      const key = guess.toLowerCase();\n";
+      html += "      if (key && normalizedAnswers.has(key) && !foundNormalized.has(key)) {\n";
+      html += "        foundNormalized.add(key);\n";
+      html += "        foundDisplay.push(guess);\n";
+      html += "        const list = document.getElementById('correct-words');\n";
+      html += "        const li = document.createElement('li');\n";
+      html += "        li.textContent = guess;\n";
+      html += "        list.appendChild(li);\n";
+      html += "        updateCounter();\n";
+      html += "      }\n";
+      html += "      inputEl.value = '';\n";
+      html += "      inputEl.focus();\n";
+      html += "    }\n";
+      html += "    document.getElementById('word-input').addEventListener('keyup', function (event) {\n";
+      html += "      if (event.key === 'Enter') { checkWord(); }\n";
+      html += "    });\n";
+      html += "    function updateCanvas(percentage) {\n";
+      html += "      const canvas = document.getElementById('progress-canvas');\n";
+      html += "      const ctx = canvas.getContext('2d');\n";
+      html += "      const centerX = canvas.width / 2;\n";
+      html += "      const centerY = canvas.height / 2;\n";
+      html += "      const radius = 60;\n";
+      html += "      ctx.clearRect(0, 0, canvas.width, canvas.height);\n";
+      html += "      ctx.beginPath();\n";
+      html += "      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);\n";
+      html += "      ctx.fillStyle = '#f3f3f3';\n";
+      html += "      ctx.fill();\n";
+      html += "      const endAngle = (percentage / 100) * 2 * Math.PI;\n";
+      html += "      ctx.beginPath();\n";
+      html += "      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + endAngle);\n";
+      html += "      ctx.lineWidth = 15;\n";
+      html += "      ctx.strokeStyle = '#4caf50';\n";
+      html += "      ctx.stroke();\n";
+      html += "      ctx.font = '18px Arial';\n";
+      html += "      ctx.fillStyle = '#333';\n";
+      html += "      ctx.textAlign = 'center';\n";
+      html += "      ctx.textBaseline = 'middle';\n";
+      html += "      ctx.fillText(Math.round(percentage) + '%', centerX, centerY);\n";
+      html += "    }\n";
+      html += "    updateCounter();\n";
+	  html += "  <" + "/script>\n";
+      html += "</body>\n";
+      html += "</html>\n";
+
+      return html;
+    }
+
+    function downloadHtmlFile(filename, contents) {
+      var blob = new Blob([contents], { type: "text/html" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("generate-btn").addEventListener("click", function () {
+      var title = document.getElementById("quiz-title").value;
+      var description = document.getElementById("quiz-description").value;
+      var answers = document.getElementById("quiz-answers").value;
+
+      var html = buildQuizHtml(title, description, answers);
+      if (!html) return;
+
+      document.getElementById("output-html").value = html;
+      var filename = slugify(title) + ".html";
+      downloadHtmlFile(filename, html);
+    });
+
+    document.getElementById("demo-btn").addEventListener("click", function () {
+      document.getElementById("quiz-title").value = "90s Riot Grrrl Band Name Quiz";
+      document.getElementById("quiz-description").value =
+        "Guess as many riot grrrl band names as you can. Spelling counts, but capitalization doesn’t.";
+      document.getElementById("quiz-answers").value =
+        "bikini kill\nbratmobile\nsleater kinney\nl7\nbabes in toyland\nle tigre\nhole";
+    });
+  </script>
+</body>
+</html>

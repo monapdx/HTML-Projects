@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textarea Persistence</title>
+</head>
+<body>
+    <textarea id="textarea1" rows="30" cols="50"></textarea>
+
+
+    <script>
+        const textareas = document.querySelectorAll('textarea');
+
+        // Function to save the content of a textarea to localStorage
+        function saveToLocalStorage(textarea) {
+            localStorage.setItem(textarea.id, textarea.value);
+        }
+
+        // Function to load the content of a textarea from localStorage
+        function loadFromLocalStorage(textarea) {
+            const savedText = localStorage.getItem(textarea.id);
+            if (savedText) {
+                textarea.value = savedText;
+            }
+        }
+
+        // Loop through each textarea to set up event listeners and load saved content
+        textareas.forEach(textarea => {
+            loadFromLocalStorage(textarea);
+
+            textarea.addEventListener('input', () => {
+                saveToLocalStorage(textarea);
+            });
+        });
+    </script>
+</body>
+</html>

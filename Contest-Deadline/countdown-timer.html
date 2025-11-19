@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown to Nov 14, 2025 (EST)</title>
+  <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+.label {
+font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;color:black;font-weight:bold;
+}
+
+
+    .countdown-wrapper {
+font-family: "Oswald", serif;
+      text-align: center;
+      padding: 24px 32px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #FF69B4, #ff009c 60%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+
+
+    #countdown {
+color:#FFFACD;
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .note {
+font-family: "Oswald", serif;
+text-transform: uppercase;
+color:#FFFACD;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      
+      
+    }
+  </style>
+</head>
+<body>
+    <div class="countdown-wrapper">
+    <div class="label">Time Remaining Until</div>
+    <div class="label">23:59 · Nov 14, 2025 · EST</div>
+    <div id="countdown">Loading…</div>
+    <div class="note">(Countdown is accurate globally using UTC)</div>
+  </div>
+
+<script>
+    // Target date: 23:59 on Nov 14, 2025 EST (UTC-5)
+    const targetDate = new Date('2025-11-15T04:59:00Z');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      const countdownEl = document.getElementById('countdown');
+
+      if (diff <= 0) {
+        countdownEl.textContent = "TIME'S UP!";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      // Only show non-zero units, except always show seconds
+      const parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      countdownEl.textContent = parts.join(' ');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>

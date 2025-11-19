@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Strict Textarea</title>
+  <style>
+  body {}
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+h2 {
+font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;
+}
+
+h3 {
+font-family: "Oswald", serif;
+	color:#757575;
+	font-size: 1em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;
+}
+
+/* Input Section */
+#input-container {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+
+}
+
+input:focus {outline: none; /* Remove the default focus outline */
+  border-color: blue; /* Change the border color on focus */
+  box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);}
+
+button {
+font-family: "Oswald", serif;
+  margin-top: 10px;
+  width: 100%;
+  background: #007bff; /* Blue button */
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  float:left;
+}
+
+button:hover {
+  background: #0056b3; /* Darker blue on hover */
+}
+
+
+
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  #app-container {
+    padding: 15px;
+  }
+
+  input {
+    font-size: 14px;
+  }
+
+  button {
+	  font-family: "Lobster", serif;
+    font-size: 14px;
+    padding: 8px;
+  }
+  
+   .word-header h2 {
+    font-size: 18px;
+  }
+}
+
+    textarea {
+	background-color:#DCEDC2;
+     width:90%;
+	 height:auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      color: #333;
+     
+      resize: vertical;
+    }
+    textarea:focus {
+      border-color: #66afe9;
+      outline: none;
+      box-shadow: 0 0 5px rgba(102, 175, 233, .6);
+    }
+    .word-count {
+      margin-top: 5px;
+      font-size: 13px;
+    }
+	
+	#essay-count {}
+	
+	.word-count {font-family: "Oswald", serif;
+	color:#757575;
+	font-size: 1em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;
+	font-weight:bold;}
+	
+.label {
+font-family: "Oswald", serif;
+	font-size: 1.5em;
+	line-height: 1.1em;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-top: 0;
+	padding: 5px 10px;
+	margin-bottom: 15px;
+	position: relative;color:black;font-weight:bold;
+}
+
+
+    .countdown-wrapper {
+font-family: "Oswald", serif;
+      text-align: center;
+      padding: 24px 32px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #FF69B4, #ff009c 60%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+	  width:90%;
+    }
+
+
+
+    #countdown {
+color:white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .note {
+font-family: "Oswald", serif;
+text-transform: uppercase;
+color:#FFFACD;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      
+      
+    }	
+  </style>
+</head>
+<body>
+<h2>Short Fiction Story Contest</h2>
+
+  <h3>Maximum Word Count: 3,000:</h3>
+  <textarea id="essay" cols="50" data-max-words="3000" placeholder="Start typing..."></textarea><br>
+  <div id="essay-count" class="word-count"><b>Words: 0</b></div>
+  <br>
+  <div class="countdown-wrapper">
+    <div class="label">Time Remaining Until</div>
+    <div class="label">23:59 · Nov 14, 2025 · EST</div>
+    <div id="countdown">Loading…</div>
+    <div class="note"></div>
+
+  <script>
+    const textarea = document.getElementById('essay');
+    const countDiv = document.getElementById('essay-count');
+    const maxWords = parseInt(textarea.getAttribute('data-max-words'), 10);
+
+    function countWords(text) {
+      const words = text.trim().split(/\s+/).filter(Boolean);
+      return words.length;
+    }
+
+    function updateTextarea() {
+      let words = textarea.value.trim().split(/\s+/).filter(Boolean);
+      let wordCount = words.length;
+
+      // Enforce word limit
+      if (wordCount > maxWords) {
+        words = words.slice(0, maxWords);
+        textarea.value = words.join(' ');
+        wordCount = maxWords;
+      }
+
+      // Update counter
+      countDiv.textContent = `Words: ${wordCount}`;
+
+      // Save to localStorage
+      localStorage.setItem(textarea.id, textarea.value);
+    }
+
+    // Load saved content on page load
+    const saved = localStorage.getItem(textarea.id);
+    if (saved) {
+      textarea.value = saved;
+      // Make sure count is correct for restored text
+      updateTextarea();
+    } else {
+      // Initialize display
+      countDiv.textContent = `Words: 0`;
+    }
+
+    // One listener that does both: limit + save
+    textarea.addEventListener('input', updateTextarea);
+  </script>
+  
+ <script>
+    // Target date: 23:59 on Nov 14, 2025 EST (UTC-5)
+    const targetDate = new Date('2025-11-15T04:59:00Z');
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      const countdownEl = document.getElementById('countdown');
+
+      if (diff <= 0) {
+        countdownEl.textContent = "TIME'S UP!";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      // Only show non-zero units, except always show seconds
+      const parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      countdownEl.textContent = parts.join(' ');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script> 
+</body>
+</html>

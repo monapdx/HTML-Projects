@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Deadline Template Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      display: flex;
+      min-height: 100vh;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .builder-shell {
+      margin: auto;
+      width: 100%;
+      max-width: 1200px;
+      background: #020617;
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 350px) minmax(0, 1fr);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+      border: 1px solid #1f2937;
+    }
+    @media (max-width: 900px) {
+      .builder-shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .panel {
+      background: #020617;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #1f2937;
+    }
+    h1, h2 {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      font: inherit;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: #f472b6;
+      box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.4);
+    }
+    input[type="number"] {
+      max-width: 160px;
+    }
+    small {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: #fdf2f8;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .copy-status {
+      font-size: 0.75rem;
+      color: #a7f3d0;
+      min-height: 1em;
+    }
+    #output {
+      width: 100%;
+      min-height: 520px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      resize: vertical;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    .hint {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+  <div class="builder-shell">
+    <!-- Left: Config form -->
+    <section class="panel">
+      <h1>Deadline Template Builder</h1>
+      <p class="subtitle">
+        Fill this out to generate a customized writing-contest deadline template you can save as its own HTML file.
+      </p>
+
+      <div class="field">
+        <label for="contest-title">Contest title</label>
+        <input
+          id="contest-title"
+          type="text"
+          placeholder="Example: WOW! Women on Writing Creative Nonfiction Contest"
+        />
+      </div>
+
+      <div class="field">
+        <label for="deadline-label-input">Deadline label (what humans see)</label>
+        <input
+          id="deadline-label-input"
+          type="text"
+          placeholder="Example: 11:59 p.m. ET — January 31, 2026"
+        />
+        <small>This becomes the text inside the pink countdown card.</small>
+      </div>
+
+      <div class="field">
+        <label for="deadline-date-input">Deadline date &amp; time</label>
+        <input
+          id="deadline-date-input"
+          type="datetime-local"
+        />
+        <small>
+          Used for <code>new Date("...")</code> in the countdown script (interpreted in the visitor’s local time).
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="max-words-input">Max words</label>
+        <input
+          id="max-words-input"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="1000"
+        />
+        <small>This updates the Max words pill, the live counter, and the remaining words line.</small>
+      </div>
+
+      <div class="row">
+        <button type="button" id="copy-btn">Copy HTML</button>
+        <button type="button" id="download-btn">Download HTML</button>
+        <span class="copy-status" id="copy-status"></span>
+      </div>
+
+      <p class="hint">
+        After downloading, rename if you like (e.g., <code>wow-cn-jan-2026.html</code>) and open it in a browser.
+      </p>
+    </section>
+
+    <!-- Right: Output -->
+    <section class="panel">
+      <h2>Generated template</h2>
+      <p class="subtitle">This is the full HTML you can save for your specific contest.</p>
+      <textarea id="output" readonly></textarea>
+    </section>
+  </div>
+
+  <!-- Base template (the actual contest page) with placeholders -->
+  <script type="text/plain" id="base-template">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{TITLE}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&display=swap');
+
+    :root {
+      --bg: #0f172a;
+      --card-bg: #ffffff;
+      --accent: #ec4899;
+      --accent-soft: rgba(236, 72, 153, 0.08);
+      --accent-strong: #db2777;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --textarea-bg: #f9fafb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #020617 55%);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 960px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
+      padding: 24px 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .title-block h1 {
+      font-family: "Oswald", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .title-block p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 32rem;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .meta-pill {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f9fafb;
+    }
+
+    .meta-label {
+      font-family: "Oswald", sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    .countdown-card {
+      min-width: 220px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, #fb7185, #db2777 65%);
+      color: #fdf2f8;
+      text-align: right;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .countdown-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.18), transparent 60%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .countdown-label {
+      position: relative;
+      font-family: "Oswald", sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .countdown-deadline {
+      position: relative;
+      font-size: 0.85rem;
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    #countdown {
+      position: relative;
+      margin-top: 4px;
+      font-family: "Oswald", sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+    }
+
+    .countdown-note {
+      position: relative;
+      margin-top: 4px;
+      font-size: 0.65rem;
+      opacity: 0.85;
+    }
+
+    .writing-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .section-label span.title {
+      font-family: "Oswald", sans-serif;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .section-label span.small {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 260px;
+      height: 55vh;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--textarea-bg);
+      font: 400 15px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      resize: vertical;
+      outline: none;
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    }
+
+    textarea:focus {
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 0 1px rgba(219, 39, 119, 0.2),
+                  0 10px 25px rgba(15, 23, 42, 0.18);
+      background: #ffffff;
+    }
+
+    textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    .word-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 6px 4px 0;
+    }
+
+    .word-count {
+      font-family: "Oswald", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+    }
+
+    .word-progress {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 260px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width 0.2s ease-out;
+    }
+
+    .word-remaining {
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      .app-shell {
+        padding: 16px 14px 12px;
+        border-radius: 16px;
+      }
+      .app-header { gap: 12px; }
+      .title-block h1 { font-size: 1.3rem; }
+      .countdown-card { width: 100%; text-align: left; }
+      #countdown { font-size: 1.25rem; }
+      textarea { height: 55vh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="title-block">
+        <h1>{{TITLE}}</h1>
+        <p>Use this space to draft your entry, track your words, and race the clock to the deadline.</p>
+
+        <div class="meta-row">
+          <div class="meta-pill">
+            <span class="meta-label">Max words</span>
+            <span>{{MAX_WORDS_LABEL}}</span>
+          </div>
+          <div class="meta-pill">
+            <span class="meta-label">Goal</span>
+            <span>Done by the deadline — no excuses.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="countdown-card">
+        <div class="countdown-label">Time remaining until</div>
+        <div class="countdown-deadline" id="deadline-label">{{DEADLINE_DISPLAY}}</div>
+        <div id="countdown">Loading…</div>
+        <div class="countdown-note">
+          Keep typing. You can edit later — you can’t move the deadline.
+        </div>
+      </div>
+    </header>
+
+    <section class="writing-section">
+      <div class="section-label">
+        <span class="title">Draft space</span>
+        <span class="small">Your work auto-saves in this browser.</span>
+      </div>
+
+      <textarea
+        id="essay"
+        data-max-words="{{MAX_WORDS}}"
+        placeholder="Start writing your story here…"
+      ></textarea>
+
+      <div class="word-row">
+        <div id="essay-count" class="word-count">Words: 0 / {{MAX_WORDS_LABEL}}</div>
+
+        <div class="word-progress">
+          <div class="progress-track">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div id="word-remaining" class="word-remaining">
+            {{MAX_WORDS_LABEL}} words remaining
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Tip: If you’re stuck, write the messy version. Future-you can fix sentences — not blank space.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const textarea = document.getElementById('essay');
+    const countDiv = document.getElementById('essay-count');
+    const progressBar = document.getElementById('progress-bar');
+    const remainingEl = document.getElementById('word-remaining');
+    const maxWords = parseInt(textarea.getAttribute('data-max-words'), 10);
+
+    function getWordArray(text) {
+      return text.trim().split(/\\s+/).filter(Boolean);
+    }
+
+    function updateWordStats() {
+      let words = getWordArray(textarea.value);
+      let wordCount = words.length;
+
+      if (!Number.isFinite(maxWords) || maxWords <= 0) return;
+
+      if (wordCount > maxWords) {
+        words = words.slice(0, maxWords);
+        textarea.value = words.join(' ');
+        wordCount = maxWords;
+      }
+
+      countDiv.textContent = \`Words: \${wordCount} / \${maxWords.toLocaleString()}\`;
+
+      const pct = Math.min(100, (wordCount / maxWords) * 100);
+      progressBar.style.width = pct + '%';
+
+      const remaining = Math.max(0, maxWords - wordCount);
+      remainingEl.textContent =
+        \`\${remaining.toLocaleString()} word\${remaining === 1 ? '' : 's'} remaining\`;
+
+      localStorage.setItem('contest-essay', textarea.value);
+    }
+
+    const savedText = localStorage.getItem('contest-essay');
+    if (savedText) {
+      textarea.value = savedText;
+    }
+    updateWordStats();
+    textarea.addEventListener('input', updateWordStats);
+
+    // --- Countdown ---
+    const deadlineDisplay = "{{DEADLINE_DISPLAY}}";
+    const targetDate = new Date("{{TARGET_DATE}}");
+
+    document.getElementById('deadline-label').textContent = deadlineDisplay;
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      const countdownEl = document.getElementById('countdown');
+
+      if (!targetDate || isNaN(targetDate.getTime())) {
+        countdownEl.textContent = "Set a valid deadline date.";
+        return;
+      }
+
+      if (diff <= 0) {
+        countdownEl.textContent = "TIME'S UP";
+        countdownEl.style.letterSpacing = '0.18em';
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const parts = [];
+      if (days > 0) parts.push(\`\${days}d\`);
+      if (hours > 0 || days > 0) parts.push(\`\${hours}h\`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(\`\${minutes}m\`);
+      parts.push(\`\${seconds}s\`);
+
+      countdownEl.textContent = parts.join(' ');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
+  </script>
+
+  <script>
+    const titleInput = document.getElementById('contest-title');
+    const deadlineLabelInput = document.getElementById('deadline-label-input');
+    const deadlineDateInput = document.getElementById('deadline-date-input');
+    const maxWordsInput = document.getElementById('max-words-input');
+    const output = document.getElementById('output');
+    const baseTemplate = document.getElementById('base-template').textContent;
+    const copyBtn = document.getElementById('copy-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const copyStatus = document.getElementById('copy-status');
+
+    function escapeForDoubleQuotedJsString(str) {
+      return String(str).replace(/"/g, '\\"');
+    }
+
+    function updateOutput() {
+      const title = titleInput.value.trim() || 'Writing Contest';
+      const deadlineDisplayRaw = deadlineLabelInput.value.trim() || '11:59 p.m. ET — January 31, 2026';
+      const maxWordsRaw = maxWordsInput.value.trim();
+      const maxWordsNum = parseInt(maxWordsRaw, 10) || 1000;
+      const maxWordsLabel = maxWordsNum.toLocaleString();
+
+      let targetDateValue = deadlineDateInput.value.trim();
+      // leave empty string if no date set; user can adjust by hand
+      const safeDeadlineDisplay = escapeForDoubleQuotedJsString(deadlineDisplayRaw);
+      const safeTargetDate = escapeForDoubleQuotedJsString(targetDateValue);
+
+      let html = baseTemplate
+        .replace(/{{TITLE}}/g, title)
+        .replace(/{{DEADLINE_DISPLAY}}/g, safeDeadlineDisplay)
+        .replace(/{{TARGET_DATE}}/g, safeTargetDate)
+        .replace(/{{MAX_WORDS}}/g, String(maxWordsNum))
+        .replace(/{{MAX_WORDS_LABEL}}/g, maxWordsLabel);
+
+      output.value = html.trim();
+    }
+
+    [titleInput, deadlineLabelInput, deadlineDateInput, maxWordsInput].forEach(el => {
+      el.addEventListener('input', updateOutput);
+    });
+
+    updateOutput();
+
+    copyBtn.addEventListener('click', () => {
+      output.select();
+      output.setSelectionRange(0, output.value.length);
+      const ok = document.execCommand('copy');
+      if (ok) {
+        copyStatus.textContent = 'Copied!';
+        setTimeout(() => (copyStatus.textContent = ''), 1500);
+      } else {
+        copyStatus.textContent = 'Press Ctrl+C to copy.';
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const htmlContent = output.value;
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+
+      const safeTitle = (titleInput.value.trim() || 'contest')
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/(^-|-$)/g, '')
+        .toLowerCase() || 'contest';
+
+      a.href = url;
+      a.download = safeTitle + '-deadline.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

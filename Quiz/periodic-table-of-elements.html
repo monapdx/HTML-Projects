@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Periodic Table of Elements</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+    body { font-family: "Oswald", serif; margin: 20px; text-align: center; }
+    #correct-words { margin-top: 20px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+    #correct-words li { list-style-type: none; margin: 5px; padding: 10px; background-color: #a8e6ce; border-radius: 5px; }
+    #correct-words li:hover { border: 1px outset #a8e6ce; background-color: #f0fff0; }
+    #counter { margin-top: 20px; font-size: 1.2em; }
+    h1 { font-weight: 800; font-style: normal; }
+    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+    input:focus { outline: none; border-color: blue; box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
+    button.answer { margin-top: 10px; width: 100%; background: #007bff; color: #fff; font-size: 16px; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s ease; }
+    button.answer:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Periodic Table of Elements</h1>
+  <p>How many can you name?</p>
+  <br><br>
+  <input type="text" id="word-input" placeholder="Type your guess..." autofocus>
+  <button onclick="checkWord()" class="answer">Submit</button>
+  <div id="counter">Correct Answers: 0 / 118</div>
+  <div id="progress-container">
+    <canvas id="progress-canvas" width="150" height="150"></canvas>
+  </div>
+  <ul id="correct-words"></ul>
+  <script>
+    const wordList = ["Hydrogen","Helium","Lithium","Beryllium","Boron","Carbon","Nitrogen","Oxygen","Fluorine","Neon","Sodium","Magnesium","Aluminium","Silicon","Phosphorus","Sulfur","Chlorine","Argon","Potassium","Calcium","Scandium","Titanium","Vanadium","Chromium","Manganese","Iron","Cobalt","Nickel","Copper","Zinc","Gallium","Germanium","Arsenic","Selenium","Bromine","Krypton","Rubidium","Strontium","Yttrium","Zirconium","Niobium","Molybdenum","Technetium","Ruthenium","Rhodium","Palladium","Silver","Cadmium","Indium","Tin","Antimony","Tellurium","Iodine","Xenon","Cesium","Barium","Lanthanum","Cerium","Praseodymium","Neodymium","Promethium","Samarium","Europium","Gadolinium","Terbium","Dysprosium","Holmium","Erbium","Thulium","Ytterbium","Lutetium","Hafnium","Tantalum","Tungsten","Rhenium","Osmium","Iridium","Platinum","Gold","Mercury","Thallium","Lead","Bismuth","Polonium","Astatine","Radon","Francium","Radium","Actinium","Thorium","Protactinium","Uranium","Neptunium","Plutonium","Americium","Curium","Berkelium","Californium","Einsteinium","Fermium","Mendelevium","Nobelium","Lawrencium","Rutherfordium","Dubnium","Seaborgium","Bohrium","Hassium","Meitnerium","Darmstadtium","Roentgenium","Copernicium","Nihonium","Flerovium","Moscovium","Livermorium","Tennessine","Oganesson"];
+    const normalizedAnswers = new Set(wordList.map(w => w.toLowerCase()));
+    const foundNormalized = new Set();
+    const foundDisplay = [];
+    const totalWords = wordList.length;
+    function updateCounter() {
+      const correctCount = foundDisplay.length;
+      document.getElementById('counter').textContent = 'Correct Answers: ' + correctCount + ' / ' + totalWords;
+      updateCanvas((correctCount / totalWords) * 100);
+    }
+    function checkWord() {
+      const inputEl = document.getElementById('word-input');
+      const guess = inputEl.value.trim();
+      const key = guess.toLowerCase();
+      if (key && normalizedAnswers.has(key) && !foundNormalized.has(key)) {
+        foundNormalized.add(key);
+        foundDisplay.push(guess);
+        const list = document.getElementById('correct-words');
+        const li = document.createElement('li');
+        li.textContent = guess;
+        list.appendChild(li);
+        updateCounter();
+      }
+      inputEl.value = '';
+      inputEl.focus();
+    }
+    document.getElementById('word-input').addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') { checkWord(); }
+    });
+    function updateCanvas(percentage) {
+      const canvas = document.getElementById('progress-canvas');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 60;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#f3f3f3';
+      ctx.fill();
+      const endAngle = (percentage / 100) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + endAngle);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = '#4caf50';
+      ctx.stroke();
+      ctx.font = '18px Arial';
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(percentage) + '%', centerX, centerY);
+    }
+    updateCounter();
+  </script>
+</body>
+</html>

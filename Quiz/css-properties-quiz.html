@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Properties Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+    body { font-family: "Oswald", serif; margin: 20px; text-align: center; }
+    #correct-words { margin-top: 20px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+    #correct-words li { list-style-type: none; margin: 5px; padding: 10px; background-color: #a8e6ce; border-radius: 5px; }
+    #correct-words li:hover { border: 1px outset #a8e6ce; background-color: #f0fff0; }
+    #counter { margin-top: 20px; font-size: 1.2em; }
+    h1 { font-weight: 800; font-style: normal; }
+    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+    input:focus { outline: none; border-color: blue; box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
+    button.answer { margin-top: 10px; width: 100%; background: #007bff; color: #fff; font-size: 16px; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s ease; }
+    button.answer:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>CSS Properties Quiz</h1>
+  <p>How many CSS3 properties can you name?</p>
+  <br><br>
+  <input type="text" id="word-input" placeholder="Type your guess..." autofocus>
+  <button onclick="checkWord()" class="answer">Submit</button>
+  <div id="counter">Correct Answers: 0 / 167</div>
+  <div id="progress-container">
+    <canvas id="progress-canvas" width="150" height="150"></canvas>
+  </div>
+  <ul id="correct-words"></ul>
+  <script>
+    const wordList = ["align-content","align-items","align-self","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","border","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-shadow","box-sizing","caption-side","clear","clip","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","content","counter-increment","counter-reset","cursor","direction","display","empty-cells","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","font","font-family","font-size","font-size-adjust","font-stretch","font-style","font-variant","font-weight","height","justify-content","left","letter-spacing","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-bottom","margin-left","margin-right","margin-top","max-height","max-width","min-height","min-width","opacity","order","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-x","overflow-y","padding","padding-bottom","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","perspective","perspective-origin","position","quotes","resize","right","tab-size","table-layout","text-align","text-align-last","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-indent","text-justify","text-overflow","text-shadow","text-transform","top","transform","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","vertical-align","visibility","white-space","width","word-break","word-spacing","word-wrap","z-index"];
+    const normalizedAnswers = new Set(wordList.map(w => w.toLowerCase()));
+    const foundNormalized = new Set();
+    const foundDisplay = [];
+    const totalWords = wordList.length;
+    function updateCounter() {
+      const correctCount = foundDisplay.length;
+      document.getElementById('counter').textContent = 'Correct Answers: ' + correctCount + ' / ' + totalWords;
+      updateCanvas((correctCount / totalWords) * 100);
+    }
+    function checkWord() {
+      const inputEl = document.getElementById('word-input');
+      const guess = inputEl.value.trim();
+      const key = guess.toLowerCase();
+      if (key && normalizedAnswers.has(key) && !foundNormalized.has(key)) {
+        foundNormalized.add(key);
+        foundDisplay.push(guess);
+        const list = document.getElementById('correct-words');
+        const li = document.createElement('li');
+        li.textContent = guess;
+        list.appendChild(li);
+        updateCounter();
+      }
+      inputEl.value = '';
+      inputEl.focus();
+    }
+    document.getElementById('word-input').addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') { checkWord(); }
+    });
+    function updateCanvas(percentage) {
+      const canvas = document.getElementById('progress-canvas');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 60;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#f3f3f3';
+      ctx.fill();
+      const endAngle = (percentage / 100) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + endAngle);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = '#4caf50';
+      ctx.stroke();
+      ctx.font = '18px Arial';
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(percentage) + '%', centerX, centerY);
+    }
+    updateCounter();
+  </script>
+</body>
+</html>

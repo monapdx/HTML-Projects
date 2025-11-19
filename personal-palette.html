@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Favorite Colors Palette</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --panel: #ffffff;
+      --ink: #222;
+      --muted: #777;
+      --accent: #ff4aa2;
+      --border: #e0e0ea;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 20px 20px 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    textarea {
+      flex: 1 1 260px;
+      min-height: 120px;
+      resize: vertical;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    textarea:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      border-color: transparent;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    button#generateBtn {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(255, 74, 162, 0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background 0.12s ease;
+      white-space: nowrap;
+    }
+
+    button#generateBtn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(255, 74, 162, 0.45);
+      background: #ff3a9a;
+    }
+
+    button#generateBtn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(255, 74, 162, 0.3);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 240px;
+    }
+
+    .error {
+      min-height: 1.1em;
+      font-size: 0.85rem;
+      color: #c62828;
+      margin-bottom: 8px;
+    }
+
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .swatch-card {
+      width: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 100%;
+      padding-bottom: 75%; /* ratio */
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .hex-label {
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--ink);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .hex-label::after {
+      content: "Click to copy";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 135%;
+      font-size: 0.7rem;
+      color: var(--muted);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .hex-label:hover::after {
+      opacity: 1;
+    }
+
+    .hex-label.copied {
+      color: var(--accent);
+    }
+
+    .hex-label.copied::after {
+      content: "Copied!";
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+      .app {
+        padding: 16px 14px 22px;
+      }
+      .swatch-card {
+        width: 96px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Favorite Color Grid</h1>
+    <p class="subtitle">
+      Paste your hex codes (one per line), then generate a palette. Click any hex
+      value to copy it.
+    </p>
+
+    <div class="input-row">
+      <textarea id="hexInput" spellcheck="false"
+        placeholder="#0066F2
+#B9D3B0
+#00E0F2
+ff009c
+f4b400"></textarea>
+
+      <div class="controls">
+        <button id="generateBtn">Generate palette</button>
+        <div class="hint">
+          • One color per line<br />
+          • 3- or 6-digit hex, with or without the <code>#</code>
+        </div>
+      </div>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="palette" class="palette"></div>
+  </div>
+
+  <script>
+    const input = document.getElementById("hexInput");
+    const generateBtn = document.getElementById("generateBtn");
+    const palette = document.getElementById("palette");
+    const errorBox = document.getElementById("error");
+
+    function normalizeHex(str) {
+      let h = str.trim();
+      if (!h) return null;
+      if (h[0] === "#") h = h.slice(1);
+      if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(h)) {
+        return null;
+      }
+      return "#" + h.toUpperCase();
+    }
+
+    function copyText(text, labelEl) {
+      function markCopied() {
+        labelEl.classList.add("copied");
+        setTimeout(() => labelEl.classList.remove("copied"), 1200);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(markCopied).catch(() => {
+          // fallback
+          const temp = document.createElement("input");
+          temp.value = text;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand("copy");
+          temp.remove();
+          markCopied();
+        });
+      } else {
+        const temp = document.createElement("input");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+        markCopied();
+      }
+    }
+
+    function createSwatch(hex) {
+      const card = document.createElement("div");
+      card.className = "swatch-card";
+
+      const swatch = document.createElement("div");
+      swatch.className = "swatch";
+      swatch.style.backgroundColor = hex;
+
+      const label = document.createElement("button");
+      label.type = "button";
+      label.className = "hex-label";
+      label.textContent = hex;
+      label.addEventListener("click", () => copyText(hex, label));
+
+      card.appendChild(swatch);
+      card.appendChild(label);
+      return card;
+    }
+
+    function generatePalette() {
+      const lines = input.value.split(/\r?\n/);
+      const valid = [];
+      const invalid = [];
+
+      lines.forEach((line, idx) => {
+        const clean = normalizeHex(line);
+        if (!line.trim()) return;
+        if (clean) valid.push(clean);
+        else invalid.push(idx + 1);
+      });
+
+      palette.innerHTML = "";
+      errorBox.textContent = "";
+
+      valid.forEach(hex => {
+        palette.appendChild(createSwatch(hex));
+      });
+
+      if (invalid.length) {
+        errorBox.textContent =
+          "Ignored invalid hex on line(s): " + invalid.join(", ");
+      }
+
+      if (!valid.length && !invalid.length) {
+        errorBox.textContent = "Paste at least one hex code to generate a palette.";
+      }
+    }
+
+    generateBtn.addEventListener("click", generatePalette);
+
+    // Optional: generate from the placeholder on first load
+    generatePalette();
+  </script>
+</body>
+</html>

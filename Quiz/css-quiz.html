@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Intermediate CSS Quiz</title>
+<style>
+  :root {
+    --bg: #0f172a;         /* slate-900 */
+    --panel: #111827;      /* gray-900 */
+    --panel-2: #0b1220;    /* custom dark */
+    --text: #e5e7eb;       /* gray-200 */
+    --muted: #94a3b8;      /* slate-400 */
+    --brand: #60a5fa;      /* blue-400 */
+    --correct: #16a34a;    /* green-600 */
+    --wrong: #ef4444;      /* red-500 */
+    --outline: #334155;    /* slate-700 */
+    --chip: #1f2937;       /* gray-800 */
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    background: radial-gradient(800px 500px at 20% 0%, #0b1220 0, var(--bg) 50%, #0a1020 100%);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 32px auto;
+    padding: 0 16px 40px;
+  }
+  header {
+    display: grid;
+    gap: 6px;
+    margin: 24px 0 16px;
+  }
+  h1 {
+    font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem);
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .controls {
+    display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 20px;
+  }
+  button, .ghost {
+    appearance: none;
+    border: 1px solid var(--outline);
+    background: linear-gradient(180deg, #172036, #121a2b);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+  button:hover { filter: brightness(1.05); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .ghost {
+    background: transparent;
+  }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--outline);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 14px 0;
+    box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  }
+  .q-head {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .q-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .meta {
+    font-size: .85rem;
+    color: var(--muted);
+  }
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  label.choice {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    align-items: start;
+    gap: 12px;
+    padding: 12px;
+    background: var(--chip);
+    border: 1px solid var(--outline);
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  label.choice input { transform: translateY(2px); }
+  .explain {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #052e1a;
+    border: 1px solid #0f3b22;
+    color: #c7f9d0;
+    display: none;
+  }
+  .explain.bad {
+    background: #3a0e10;
+    border-color: #551316;
+    color: #ffd2d2;
+  }
+  .pill {
+    display: inline-block;
+    font-size: .8rem;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--outline);
+    color: var(--muted);
+  }
+  .result {
+    position: sticky; bottom: 12px;
+    background: rgba(2,8,23,.75);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--outline);
+    padding: 14px 16px;
+    border-radius: 14px;
+    display: flex; justify-content: space-between; gap: 10px; align-items: center;
+    margin-top: 16px;
+  }
+  .score {
+    font-weight: 800;
+    letter-spacing: .3px;
+  }
+  .badge {
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--outline);
+  }
+  .good { color: #86efac; border-color: #14532d; background: #052e1a; }
+  .meh  { color: #fde68a; border-color: #4d3b0f; background: #2a220a; }
+  .poor { color: #fecaca; border-color: #7f1d1d; background: #3a0e10; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #0b1220;
+    border: 1px solid var(--outline);
+    padding: 1px 6px;
+    border-radius: 6px;
+  }
+  .hint { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Intermediate CSS Quiz</h1>
+    <div class="sub">15 multiple-choice questions on specificity, layout, cascade layers, queries, and modern CSS features.</div>
+    <div class="controls">
+      <button id="btn-check">Check answers</button>
+      <button id="btn-review" class="ghost" disabled>Toggle review mode</button>
+      <button id="btn-restart" class="ghost">New shuffle</button>
+    </div>
+    <div class="hint">Tip: Answers shuffle each run. Review mode reveals correct answers and explanations.</div>
+  </header>
+
+  <main id="quiz"></main>
+
+  <div class="result" aria-live="polite">
+    <div class="score" id="score">Score: 0 / 15</div>
+    <div id="rating" class="badge meh">Not graded yet</div>
+  </div>
+</div>
+
+<script>
+/* ==== Question Bank (intermediate CSS) ==== */
+const BANK = [
+  {
+    q: "Which selector’s specificity is correctly ordered from lowest to highest?",
+    choices: [
+      "Type selector, class selector, ID selector",
+      "Class selector, ID selector, type selector",
+      "ID selector, class selector, type selector",
+      "Type selector, ID selector, class selector"
+    ],
+    a: 0,
+    explain: "Specificity increases as: element/type (0,0,1) < class/attribute/pseudo-class (0,1,0) < ID (1,0,0)."
+  },
+  {
+    q: "What’s true about :is() and :where() regarding specificity?",
+    choices: [
+      ":is() takes the highest specificity of its arguments; :where() always has zero specificity",
+      ":is() always has zero specificity; :where() takes the highest",
+      "Both always take the specificity of the first argument",
+      "Both add +1 to the specificity of the compound selector"
+    ],
+    a: 0,
+    explain: ":is() adopts the most specific argument; :where() contributes 0 specificity, by design."
+  },
+  {
+    q: "Which statement about stacking contexts is correct?",
+    choices: [
+      "Any element with a transform creates a new stacking context",
+      "Only positioned elements with z-index create stacking contexts",
+      "Opacity creates a stacking context only when ≤ 0.5",
+      "Flex items never create stacking contexts"
+    ],
+    a: 0,
+    explain: "Transform, opacity < 1, filters, will-change, position + z-index and others can create stacking contexts."
+  },
+  {
+    q: "What does establishing a Block Formatting Context (BFC) help with?",
+    choices: [
+      "Containing floats so they don’t overflow their container",
+      "Forcing inline elements to behave like blocks",
+      "Resetting specificity within its subtree",
+      "Creating a new containing block for fixed positioning"
+    ],
+    a: 0,
+    explain: "BFCs (e.g., overflow:auto, display: flow-root) contain floats and prevent margin-collapsing across the boundary."
+  },
+  {
+    q: "In the cascade with @layer, which rule wins by default?",
+    choices: [
+      "A rule in a later-declared layer",
+      "A rule with fewer selectors",
+      "A rule in an earlier-declared layer",
+      "Layer order doesn’t affect the cascade"
+    ],
+    a: 0,
+    explain: "Cascade layers respect layer order: later-declared layers override earlier ones (after origin/import precedence)."
+  },
+  {
+    q: "Which unit adapts best to dynamic browser UI on mobile (e.g., shrinking address bar)?",
+    choices: [
+      "dvh",
+      "vh",
+      "vmin",
+      "svh"
+    ],
+    a: 0,
+    explain: "Dynamic viewport units like dvh track the *dynamic* viewport size as UI chrome expands/collapses."
+  },
+  {
+    q: "Given flex container: <code>display:flex</code>. Which shrinks first when space is limited (default settings)?",
+    choices: [
+      "Items with larger flex-basis",
+      "Items with smaller flex-basis",
+      "All items equally regardless of basis",
+      "Only items with flex-grow set"
+    ],
+    a: 0,
+    explain: "Default is <code>flex: 0 1 auto</code>; items shrink (flex-shrink:1) proportionally from their flex-basis/size. Larger bases yield more shrink."
+  },
+  {
+    q: "What’s the initial containing block for <code>position: fixed</code> elements in modern browsers (without transforms/contain)?",
+    choices: [
+      "Viewport",
+      "Closest ancestor with position other than static",
+      "Nearest scrolling ancestor",
+      "Initial containing block of the root element’s parent"
+    ],
+    a: 0,
+    explain: "Fixed-position elements are positioned relative to the viewport unless transformed/contained ancestors change it."
+  },
+  {
+    q: "Which Grid feature lets a child align to columns/rows defined by its parent’s tracks?",
+    choices: [
+      "subgrid",
+      "grid-auto-flow: dense",
+      "auto-fit with minmax",
+      "place-content"
+    ],
+    a: 0,
+    explain: "<code>subgrid</code> allows grid children to use the parent’s track sizing for rows/columns."
+  },
+  {
+    q: "Choose the best way to clamp responsive font size between 1rem and 2.25rem.",
+    choices: [
+      "font-size: clamp(1rem, 2vw + 1rem, 2.25rem);",
+      "font-size: max(1rem, min(2.25rem, 2vw + 1rem));",
+      "font-size: clamp(2.25rem, 2vw + 1rem, 1rem);",
+      "font-size: min(2.25rem, max(1rem, 2vw + 1rem));"
+    ],
+    a: 0,
+    explain: "<code>clamp(min, preferred, max)</code> constrains a fluid size between set bounds."
+  },
+  {
+    q: "Which media feature is best to reduce motion-heavy animations for some users?",
+    choices: [
+      "@media (prefers-reduced-motion: reduce)",
+      "@media (reduced-motion)",
+      "@media (motion: none)",
+      "@media (prefers-no-motion: yes)"
+    ],
+    a: 0,
+    explain: "Use the standardized <code>@media (prefers-reduced-motion: reduce)</code> to honor user OS settings."
+  },
+  {
+    q: "What does <code>contain: paint;</code> primarily do?",
+    choices: [
+      "Limits painting to the element’s box, creating a new stacking context",
+      "Prevents the element from receiving pointer events",
+      "Forces the element to be its own BFC only",
+      "Disables compositing for the element"
+    ],
+    a: 0,
+    explain: "Paint containment restricts painting to the element’s bounds and establishes a new stacking context."
+  },
+  {
+    q: "How does <code>:has()</code> behave in CSS selectors?",
+    choices: [
+      "It’s a relational pseudo-class that matches a parent when it contains a given relative selector",
+      "It selects descendants that have a given ancestor",
+      "It’s only available in JS, not CSS",
+      "It increases specificity by +1 regardless of arguments"
+    ],
+    a: 0,
+    explain: "<code>:has()</code> lets you style an element based on its descendants/relatives (e.g., <code>label:has(input:checked)</code>)."
+  },
+  {
+    q: "Which statement about container queries is accurate?",
+    choices: [
+      "They use <code>@container</code> rules and require an ancestor with <code>container-type</code> set (e.g., <code>inline-size</code>)",
+      "They replace all media queries and don’t need any setup",
+      "They only work for height, not inline size",
+      "They must be declared at the top level only"
+    ],
+    a: 0,
+    explain: "Container queries need a containment context (e.g., <code>container-type: inline-size</code>) on an ancestor; then use <code>@container</code>."
+  },
+  {
+    q: "Which property is most appropriate to change the accent of checkboxes and radio buttons?",
+    choices: [
+      "accent-color",
+      "appearance",
+      "color-scheme",
+      "filter: hue-rotate()"
+    ],
+    a: 0,
+    explain: "<code>accent-color</code> styles the highlight of form controls like checkboxes, radios, and range inputs."
+  }
+];
+
+/* ==== State & Helpers ==== */
+function shuffled(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function render(questions) {
+  const host = document.getElementById('quiz');
+  host.innerHTML = '';
+  questions.forEach((q, i) => {
+    const card = document.createElement('section');
+    card.className = 'card';
+    card.dataset.index = i;
+
+    const head = document.createElement('div');
+    head.className = 'q-head';
+    head.innerHTML = `
+      <div class="meta"><span class="pill">Question ${i+1}</span></div>
+      <div class="q-title">${q.q}</div>
+    `;
+
+    const fs = document.createElement('fieldset');
+    fs.role = 'radiogroup';
+    fs.ariaLabel = `Question ${i+1}`;
+
+    const name = `q_${i}`;
+    q.choices.forEach((choice, j) => {
+      const id = `${name}_${j}`;
+      const lab = document.createElement('label');
+      lab.className = 'choice';
+      lab.setAttribute('for', id);
+      lab.innerHTML = `
+        <input type="radio" id="${id}" name="${name}" value="${j}" />
+        <span>${choice}</span>
+      `;
+      fs.appendChild(lab);
+    });
+
+    const exp = document.createElement('div');
+    exp.className = 'explain';
+    exp.id = `exp_${i}`;
+    exp.textContent = q.explain;
+
+    card.appendChild(head);
+    card.appendChild(fs);
+    card.appendChild(exp);
+    host.appendChild(card);
+  });
+}
+
+let QUESTIONS = [];
+let REVIEW_MODE = false;
+
+function newQuiz() {
+  // Shuffle questions & choices each run
+  const qOrder = shuffled(BANK).slice(0, 15);
+  QUESTIONS = qOrder.map(q => {
+    const choices = shuffled(q.choices);
+    const answerText = q.choices[q.a];
+    const newAnswerIndex = choices.indexOf(answerText);
+    return { ...q, choices, a: newAnswerIndex };
+  });
+  REVIEW_MODE = false;
+  render(QUESTIONS);
+  updateScore(true);
+  document.getElementById('btn-review').disabled = true;
+  document.getElementById('rating').textContent = 'Not graded yet';
+  document.getElementById('rating').className = 'badge meh';
+}
+
+function collectAnswers() {
+  return QUESTIONS.map((_, i) => {
+    const checked = document.querySelector(`input[name="q_${i}"]:checked`);
+    return checked ? Number(checked.value) : null;
+  });
+}
+
+function grade() {
+  const answers = collectAnswers();
+  let correct = 0;
+
+  answers.forEach((ans, i) => {
+    const isCorrect = ans === QUESTIONS[i].a;
+    const card = document.querySelector(`.card[data-index="${i}"]`);
+    const exp = document.getElementById(`exp_${i}`);
+
+    // Highlight selection feedback only in review mode
+    if (REVIEW_MODE) {
+      exp.style.display = 'block';
+      exp.classList.toggle('bad', !isCorrect);
+    } else {
+      exp.style.display = 'none';
+    }
+
+    if (ans !== null && REVIEW_MODE) {
+      const labels = card.querySelectorAll('label.choice');
+      labels.forEach((lab, j) => {
+        lab.style.outline = '';
+        lab.style.borderColor = 'var(--outline)';
+        if (j === QUESTIONS[i].a) {
+          lab.style.outline = `2px solid var(--correct)`;
+          lab.style.borderColor = 'rgba(22,163,74,.6)';
+        }
+        if (j === ans && j !== QUESTIONS[i].a) {
+          lab.style.outline = `2px solid var(--wrong)`;
+          lab.style.borderColor = 'rgba(239,68,68,.6)';
+        }
+      });
+    }
+
+    if (isCorrect) correct++;
+  });
+
+  updateScore(false, correct);
+  return { correct, total: QUESTIONS.length };
+}
+
+function updateScore(initial=false, score=0) {
+  const total = QUESTIONS.length || 15;
+  const s = document.getElementById('score');
+  s.textContent = `Score: ${initial ? 0 : score} / ${total}`;
+
+  const rating = document.getElementById('rating');
+  if (initial) {
+    rating.textContent = 'Not graded yet';
+    rating.className = 'badge meh';
+    return;
+  }
+  const pct = (score / total) * 100;
+  if (pct >= 80) {
+    rating.textContent = 'Great!';
+    rating.className = 'badge good';
+  } else if (pct >= 60) {
+    rating.textContent = 'Keep going';
+    rating.className = 'badge meh';
+  } else {
+    rating.textContent = 'Review recommended';
+    rating.className = 'badge poor';
+  }
+}
+
+/* ==== Events ==== */
+document.getElementById('btn-check').addEventListener('click', () => {
+  // First click grades; subsequent clicks re-grade after changes.
+  const { correct } = grade();
+  // Enable review toggle after first grade
+  document.getElementById('btn-review').disabled = false;
+});
+
+document.getElementById('btn-review').addEventListener('click', () => {
+  REVIEW_MODE = !REVIEW_MODE;
+  // Re-apply grading visuals based on mode
+  grade();
+  document.getElementById('btn-review').textContent = REVIEW_MODE ? 'Hide review mode' : 'Show review mode';
+});
+
+document.getElementById('btn-restart').addEventListener('click', () => {
+  newQuiz();
+  document.getElementById('btn-review').textContent = 'Toggle review mode';
+});
+
+/* ==== Init ==== */
+newQuiz();
+</script>
+</body>
+</html>
