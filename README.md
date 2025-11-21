@@ -32,32 +32,7 @@ Everything here is designed to be **copy‑paste friendly**, with minimal depend
 
 Below is an auto‑generated index from the current files. If a project is missing a description, you can improve it by adding a `<meta name="description">` tag or an `<h1>` with a meaningful summary in its HTML.
 
-| Project | Entry File | Summary |
-|---|---|---|
-| `City Builder` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/city-builder.png" alt="Humor DNA Banner" width="345"> |Ready-to-play city builder game in old school pixel art style. |
-| `Kindle Cookbook Formatter` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/cookbook-formatter.png" alt="" width="345"> | Easily format beautiful cookbooks ready to upload and publish on Amazon Kindle. |
-| `Dictionary Lookup` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/dictionary.png" alt="" width="345"> | Lookup words in the Merriam-Webster dictionary. |
-| `Empty HTML Tag Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/empty-tag-generator.png" alt="" width="345"> | Generate empty HTML tags and add CSS classes (optional). Supports nested tags. |
-| `Goal Tracker` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/goal-tracker.png" alt="" width="345"> | Track your savings towards large purchases using this goal tracker. |
-| `Quiz` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/html5-quiz.png" alt="" width="345"> | Quiz that can be modified with any set of correct answers and customized to your needs. |
-| `List Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/list-maker.png" alt="" width="345"> | Generate to-do lists, export to HTML. |
-| `Movie Search` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/movie-search.png" alt="" width="345"> | Search for movies. |
-| `Note Saver` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/notes.png" alt="" width="345"> | Save text notes in the browser. |
-| `Philosophical Alignment Test` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/philosophy-quiz.png" alt="" width="340"> | Which Philosophical Movements Align With You? |
-| `Pixel Art Drawboard` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/pixel-art-draw.png" alt="" width="345"> | Canvas for drawing pixel art. |
-| `URL to QR Code` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/qr-codes.png" alt="" width="345"> | URL to QR Code generator. |
-| `Quote Graphic Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/quote-image-generator.png" alt="" width="345"> | Generate quote graphics to share on social media. Choose your gradient colors, font, and enter your favorite quote. |
-| `Random Color Palettes` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/random-color-palette.png" alt="" width="345"> | Generate random color palettes with hex codes. |
-| `Rhyme Search` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/rhymes.png" alt="" width="345"> | Rhyming word finder powered by Datamuse API. |
-| `SMS Templates` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/sms-templates.png" alt="" width="345"> | Save frequently used text messages and easily copy and paste them into Google Voice while on desktop. |
-| `Editable HTML Table Generator` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/table-generator.png" alt="" width="345"> | Generates editable HTML tables with custom headings and click-to-edit in place cells. |
-| `Synonym Lookup` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/synonym-lookup.png" alt="" width="345"> | Lookup word synonyms. |
-| `Voice Recorder` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/voice-record.png" alt="" width="345"> | Record voice notes and download them in the browser. |
-| `Poetry Grid Helper` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Poetry-Grid-Helper-12-17-2024_07_18_AM.png" alt="" width="345"> | Try to write poems that read exactly the same horizontally and vertically! |
-| `Folder Structure Generator` | <img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/img/folder-structure%20(1).png" alt="" width="352"> | Folder structure visualization generator. |
-| `Wikipedia Editor` | <img src="https://raw.githubusercontent.com/monapdx/HTML-Projects/refs/heads/main/img/Write-Your-Own-Wikipedia-Page-10-22-2025_08_10_PM.png" alt="" width="340"> | Wikipedia-style editor for writing your own Wikipedia page. |
-| `Offline GPT` | <img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/img/offline-GPT.png" alt="" width="420"> | Load your conversations.json file from ChatGPT export and browse chats locally/offline. |
-| `Writing Deadline` | <img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/img/writing-contest-helper.png" alt="" width="444"> | Deadline countdown, word limit enforced and content saved in textarea. |
+<img src="https://raw.githubusercontent.com/monapdx/Frontend-Widgets/refs/heads/main/frontend-widgets-table.png">
 
 
 ## How To Customize
