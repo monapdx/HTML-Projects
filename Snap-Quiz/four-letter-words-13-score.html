@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Four Letter Words 13+ Score</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+    body { font-family: "Oswald", serif; margin: 20px; text-align: center; }
+    #correct-words { margin-top: 20px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+    #correct-words li { list-style-type: none; margin: 5px; padding: 10px; background-color: #a8e6ce; border-radius: 5px; }
+    #correct-words li:hover { border: 1px outset #a8e6ce; background-color: #f0fff0; }
+    #counter { margin-top: 20px; font-size: 1.2em; }
+    h1 { font-weight: 800; font-style: normal; }
+    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+    input:focus { outline: none; border-color: blue; box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
+    button.answer { margin-top: 10px; width: 100%; background: #007bff; color: #fff; font-size: 16px; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s ease; }
+    button.answer:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Four Letter Words 13+ Score</h1>
+  <p></p>
+  <br><br>
+  <input type="text" id="word-input" placeholder="Type your guess..." autofocus>
+  <button onclick="checkWord()" class="answer">Submit</button>
+  <div id="counter">Correct Answers: 0 / 625</div>
+  <div id="progress-container">
+    <canvas id="progress-canvas" width="150" height="150"></canvas>
+  </div>
+  <ul id="correct-words"></ul>
+  <script>
+    const wordList = ["ADZE","APEX","AQUA","AZAN","AZON","BAWK","BAZZ","BIZE","BOXY","BOZO","BRUX","BUZZ","CAKY","CALX","CAZH","CHEZ","CHIZ","CHOC","CHOP","CHOW","CHUB","CHUG","CZAR","DAFF","DAFT","DAZE","DZHO","EQUI","EXEC","EXED","EXES","EXIT","EXON","EXPO","FADY","FADO","FALL","FALX","FAUX","FAZE","FECK","FIZZ","FLAX","FLEX","FLUX","FOLX","FOXY","FOZY","FRIZ","FUCK","FUJI","FUTZ","FUZE","FUZZ","FYKE","GABY","GAFF","GAUZ","GAWK","GAZE","GECK","GEEZ","GOAF","GOOK","GOOP","GOYS","GROK","GUCK","HACK","HADE","HADJ","HAFT","HAIK","HAJJ","HAKE","HAKU","HAZY","HECK","HEXAD","HICK","HIGH","HIKU","HOKE","HOLK","HOMY","HUCK","HUFF","HUSK","HYMN","HYPE","HYPO","IBEX","JABS","JACK","JADE","JAGG","JAIL","JAKE","JAMB","JAMS","JANE","JAPE","JARL","JARS","JATO","JAUK","JAUP","JAVA","JAWS","JAYS","JAZZ","JEEP","JEEZ","JEFE","JEHU","JERK","JEUX","JIBB","JIBE","JIBS","JIFF","JIGS","JILT","JIMP","JINK","JINN","JINS","JINX","JISM","JIVE","JIVY","JIZZ","JOCK","JOKE","JOKY","JOLT","JOSH","JOUK","JOWL","JOWS","JUBE","JUCO","JUDO","JUGA","JUGS","JUJU","JUKE","JUMP","JUNK","JURY","JUST","JUTS","KAPH","KECK","KEEF","KEEK","KEEL","KEEP","KEGS","KEMP","KENO","KERB","KERF","KETO","KHAF","KHAN","KHAT","KHET","KICK","KIEF","KILL","KILN","KILP","KIRK","KITE","KITH","KIVA","KNAP","KNAR","KNEE","KNIT","KNOB","KNOP","KNOT","KNUR","KOHL","KOIS","KOJI","KOPH","KUDO","KUDU","LARL","LARY","LAVA","LAVE","LAVS","LAXY","LEXY","LIMY","LIVY","LUXE","MAXI","MERC","MOJO","MOXA","MOZO","MPOX","MUCK","MUFF","MUGG","MUMP","NIXE","NIXY","ONYX","OOZY","OPAH","OXEN","OXER","OXES","OXIC","OXID","OXIM","PACY","PACK","PFFT","PHAT","PHIZ","PHON","PHUT","PICK","PICK","PIPY","PIXU","PIXY","PLOP","PLOY","POCK","POGY","POKY","POON","POOR","POUF","POUT","POXY","PREX","PREZ","PRIG","PROX","PSST","PTUI","PUCK","PUDU","PUFF","PUGH","PULK","PUMP","PYAS","PYIC","PYIN","PYRE","PYRO","QADI","QAID","QATS","QOPH","QUAD","QUAG","QUAI","QUAY","QUEY","QUID","QUIN","QUIP","QUIT","QUIZ","QUOD","RAZE","RAZZ","RAXX","RAXX (if allowed in your source list; in the given text only VAXX appears)","RITZ","ROUX","RUBE","RUBY","RUCK","RUDD","RUFF","RUGA","RUKH","RUSK","SCOX","SCUD","SCUM","SCUP","SCUT","SEXT","SEXY","SHAD","SHAG","SHAH","SHAM","SHAT","SHAW","SHAY","SHEX","SHIT","SHIV","SHMO","SHOW","SHRI","SHUL","SHUN","SHUT","SIKE","SILK","SINE","SING","SINK","SINS","SIRE","SIZE","SIZY","SKAG","SKAS","SKAT","SKED","SKEE","SKEG","SKEP","SKEW","SKID","SKIM","SKIN","SKIP","SKIS","SKIT","SKRY","SLAV","SMEW","SMOG","SMUG","SMUT","SNAG","SNOB","SNOG","SNOT","SNOW","SNUB","SNUG","SNYE","SOJA","SOJU","SOOK","SOUK","SOUL","SOYA","SPAZ","SPEC","SPEW","SPIV","SPRY","SPUD","SPUE","SPUN","SPUR","SQUID","STEM","STEW","STOW","STUB","STUD","STUM","STUN","SUCK","SUDD","SUET","SUKH","SUKS","SUMP","SUNG","SUNK","SUNN","SWAB","SWAG","SWAM","SWAP","SWAT","SWAY","SWIG","SWIM","SWOB","SWOP","SWOT","SWUM","SYNC","SYPH","TACK","TACT","TADS","TAHR","TALA","TALC","TAMP","TANG","TANK","TAPE","TAPS","TAUT","TAVS","TAXA","TAXI","TEAK","TECH","TEMP","TEXT","THAE","THAN","THAT","THAW","THEW","THIN","THIO","THIR","THIS","THOU","THRO","THRU","THUD","THUG","TZAR","UDON","UGLY","VAMP","VARY","VASA","VAST","VATU","VAUS","VAVS","VAWS","VAXX","VEEP","VERT","VERY","VEST","VEXT","VIAL","VIBE","VICE","VIEW","VIFF","VIGA","VIGS","VILE","VINO","VINY","VIOL","VIRL","VISA","VIVA","VIVE","VLEI","VLOG","VOGS","VOID","VOLE","VOLK","VOLT","VOTE","VOWS","VROW","VUGG","VUGH","VUGS","VULN","WACK","WAFF","WAFT","WAGE","WAGS","WAIF","WAIL","WAIT","WAKE","WALE","WALK","WALL","WAME","WANK","WANT","WARY","WASH","WASP","WAST","WATT","WAUK","WAUL","WAVE","WAVY","WAWL","WAWS","WAXY","WEEK","WELD","WELT","WERE","WHAM","WHAP","WHAT","WHEE","WHEN","WHET","WHEW","WHEY","WHID","WHIG","WHIM","WHIN","WHIP","WHIR","WHIT","WHIZ","WHOA","WHOM","WHOP","WHUP","WICK","WIFE","WILD","WILT","WILY","WIMP","WIND","WING","WINK","WINY","WIPE","WIRE","WIRY","WISE","WISH","WISP","WIVE","WOLF","WOMB","WONT","WORD","WORK","WORM","WOVE","XYST","YACK","YAFF","YAGI","YANK","YAWL","YAWN","YAWP","YEAH","YECH","YEET","YEGG","YELD","YELK","YELL","YELP","YERK","YETI","YEUK","YIPE","YIPS","YOCK","YODH","YOGA","YOGH","YOKE","YOLK","YOMP","YOND","YONI","YOWE","YOWL","YUAN","YUCH","YUCK","YUGA","YUKS","YURT","YUTZ","ZAGS","ZANY","ZAPS","ZARF","ZEAL","ZEBU","ZEDS","ZEES","ZEIN","ZEKS","ZENS","ZEPS","ZERK","ZERO","ZEST","ZETA","ZIGS","ZILL","ZINC","ZINE","ZING","ZINS","ZIPS","ZITI","ZITS","ZIZZ","ZONA","ZONE","ZONK","ZOOM","ZOON","ZOOS","ZORI","ZOUK","ZUKE","ZYME"];
+    const normalizedAnswers = new Set(wordList.map(w => w.toLowerCase()));
+    const foundNormalized = new Set();
+    const foundDisplay = [];
+    const totalWords = wordList.length;
+    function updateCounter() {
+      const correctCount = foundDisplay.length;
+      document.getElementById('counter').textContent = 'Correct Answers: ' + correctCount + ' / ' + totalWords;
+      updateCanvas((correctCount / totalWords) * 100);
+    }
+    function checkWord() {
+      const inputEl = document.getElementById('word-input');
+      const guess = inputEl.value.trim();
+      const key = guess.toLowerCase();
+      if (key && normalizedAnswers.has(key) && !foundNormalized.has(key)) {
+        foundNormalized.add(key);
+        foundDisplay.push(guess);
+        const list = document.getElementById('correct-words');
+        const li = document.createElement('li');
+        li.textContent = guess;
+        list.appendChild(li);
+        updateCounter();
+      }
+      inputEl.value = '';
+      inputEl.focus();
+    }
+    document.getElementById('word-input').addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') { checkWord(); }
+    });
+    function updateCanvas(percentage) {
+      const canvas = document.getElementById('progress-canvas');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 60;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#f3f3f3';
+      ctx.fill();
+      const endAngle = (percentage / 100) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + endAngle);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = '#4caf50';
+      ctx.stroke();
+      ctx.font = '18px Arial';
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(percentage) + '%', centerX, centerY);
+    }
+    updateCounter();
+  </script>
+</body>
+</html>

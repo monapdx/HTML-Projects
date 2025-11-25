@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Placeholdr Image Tool</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+    }
+    .app {
+      width: 100%;
+      max-width: 720px;
+      background: #020617;
+      border-radius: 18px;
+      padding: 24px 24px 28px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+      border: 1px solid #1f2937;
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.5rem;
+    }
+    .subtitle {
+      margin: 0 0 20px;
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px 20px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ca3af;
+    }
+    input[type="number"],
+    input[type="text"],
+    select {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 1px #1d4ed8;
+      background: #020818;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    button {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #4f46e5, #ec4899);
+      color: white;
+      box-shadow: 0 10px 25px rgba(148, 163, 255, 0.4);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s;
+      white-space: nowrap;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(148, 163, 255, 0.55);
+      filter: brightness(1.05);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(148, 163, 255, 0.35);
+    }
+    .result {
+      margin-top: 8px;
+      border-top: 1px solid #1f2937;
+      padding-top: 16px;
+      display: none;
+      gap: 14px;
+    }
+    .url-row {
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+    .url-label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .url-box {
+      background: #020617;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      padding: 8px 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+    }
+    .url-box a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    .url-box a:hover {
+      text-decoration: underline;
+    }
+    .preview-wrapper {
+      border-radius: 14px;
+      border: 1px dashed #374151;
+      padding: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      background: radial-gradient(circle at top left, rgba(96,165,250,0.18), transparent 55%);
+    }
+    #preview {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+    .hint {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    .error {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Placeholdr Image Builder</h1>
+    <p class="subtitle">Enter size, prompt, and style to generate a Placeholdr URL and preview the image.</p>
+
+    <form id="imageForm">
+      <div class="field">
+        <label for="width">Width (px)</label>
+        <input id="width" type="number" min="1" max="2048" value="512" required />
+      </div>
+      <div class="field">
+        <label for="height">Height (px)</label>
+        <input id="height" type="number" min="1" max="2048" value="512" required />
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label for="prompt">Prompt</label>
+        <input
+          id="prompt"
+          type="text"
+          placeholder="e.g. neon cyberpunk city at night"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="style">Style</label>
+        <select id="style">
+          <option value="artistic">artistic</option>
+          <option value="anime">anime</option>
+          <option value="oil-painting">oil-painting</option>
+          <option value="3d-render">3d-render</option>
+          <option value="cartoon">cartoon</option>
+        </select>
+      </div>
+      <div class="field">
+        <button type="submit">Generate Image</button>
+      </div>
+    </form>
+
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result">
+      <div class="url-row">
+        <div class="url-label">Generated URL</div>
+        <div class="url-box">
+          <a id="imageLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+        <div class="hint">You can copy this URL or open it in a new tab.</div>
+      </div>
+      <div class="preview-wrapper">
+        <img id="preview" alt="Generated placeholder preview" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("imageForm");
+    const widthInput = document.getElementById("width");
+    const heightInput = document.getElementById("height");
+    const promptInput = document.getElementById("prompt");
+    const styleSelect = document.getElementById("style");
+
+    const resultEl = document.getElementById("result");
+    const linkEl = document.getElementById("imageLink");
+    const previewEl = document.getElementById("preview");
+    const errorEl = document.getElementById("error");
+
+    function buildPlaceholdrUrl(width, height, prompt, style) {
+      const trimmedPrompt = prompt.trim();
+      const encodedPrompt = encodeURIComponent(trimmedPrompt);
+      return `https://placeholdr.dev/${width}x${height}/${encodedPrompt}?style=${encodeURIComponent(style)}`;
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      errorEl.textContent = "";
+
+      const width = parseInt(widthInput.value, 10);
+      const height = parseInt(heightInput.value, 10);
+      const prompt = promptInput.value;
+      const style = styleSelect.value;
+
+      if (!width || !height || width <= 0 || height <= 0) {
+        errorEl.textContent = "Width and height must both be positive numbers.";
+        return;
+      }
+
+      if (!prompt.trim()) {
+        errorEl.textContent = "Please enter a prompt.";
+        return;
+      }
+
+      const url = buildPlaceholdrUrl(width, height, prompt, style);
+
+      // Update URL text + link
+      linkEl.textContent = url;
+      linkEl.href = url;
+
+      // Set image src to "fetch" the image
+      previewEl.src = url;
+      previewEl.alt = `Placeholdr image: ${prompt} (${style}, ${width}x${height})`;
+
+      // Reveal result area
+      resultEl.style.display = "grid";
+    });
+  </script>
+</body>
+</html>

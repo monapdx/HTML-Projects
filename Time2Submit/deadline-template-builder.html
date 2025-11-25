@@ -3,540 +3,949 @@
 <head>
   <meta charset="UTF-8" />
   <title>Deadline Template Builder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #020617;
-      color: #e5e7eb;
-      display: flex;
-      min-height: 100vh;
-      padding: 16px;
+    * {
       box-sizing: border-box;
     }
-    .builder-shell {
-      margin: auto;
-      width: 100%;
-      max-width: 1200px;
-      background: #020617;
-      border-radius: 18px;
-      padding: 18px;
-      display: grid;
-      gap: 16px;
-      grid-template-columns: minmax(0, 350px) minmax(0, 1fr);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
-      border: 1px solid #1f2937;
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827, #020617 45%, #000000);
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
     }
-    @media (max-width: 900px) {
-      .builder-shell {
-        grid-template-columns: minmax(0, 1fr);
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      padding: 24px 24px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      display: grid;
+      grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .page {
+        grid-template-columns: 1fr;
       }
     }
-    .panel {
-      background: #020617;
-      border-radius: 14px;
-      padding: 16px;
-      border: 1px solid #1f2937;
-    }
-    h1, h2 {
-      margin: 0 0 6px;
-      font-size: 1.2rem;
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
+      color: #e5e7eb;
     }
-    .subtitle {
+
+    .subhead {
+      margin: 0 0 16px;
+      font-size: 0.87rem;
+      color: #9ca3af;
+      max-width: 520px;
+    }
+
+    .left-column {
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .left-column h2 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .hint {
+      margin: 0 0 12px;
       font-size: 0.8rem;
       color: #9ca3af;
+    }
+
+    .field-group {
       margin-bottom: 10px;
     }
+
     label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #9ca3af;
       margin-bottom: 4px;
     }
-    .field {
-      margin-bottom: 10px;
-    }
-    input, textarea {
-      width: 100%;
-      box-sizing: border-box;
-      font: inherit;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #374151;
-      background: #020617;
-      color: #e5e7eb;
-      outline: none;
-    }
-    input:focus, textarea:focus {
-      border-color: #f472b6;
-      box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.4);
-    }
-    input[type="number"] {
-      max-width: 160px;
-    }
-    small {
-      font-size: 0.7rem;
-      color: #6b7280;
-    }
-    .row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 600;
-      background: linear-gradient(135deg, #ec4899, #db2777);
-      color: #fdf2f8;
-    }
-    button:active {
-      transform: translateY(1px);
-    }
-    .copy-status {
-      font-size: 0.75rem;
-      color: #a7f3d0;
-      min-height: 1em;
-    }
-    #output {
-      width: 100%;
-      min-height: 520px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.75rem;
-      line-height: 1.4;
-      resize: vertical;
-      background: #020617;
-      color: #e5e7eb;
-    }
-    .hint {
-      margin-top: 6px;
+
+    label small {
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
       font-size: 0.7rem;
       color: #9ca3af;
     }
-  </style>
-</head>
-<body>
-  <div class="builder-shell">
-    <!-- Left: Config form -->
-    <section class="panel">
-      <h1>Deadline Template Builder</h1>
-      <p class="subtitle">
-        Fill this out to generate a customized writing-contest deadline template you can save as its own HTML file.
-      </p>
 
-      <div class="field">
-        <label for="contest-title">Contest title</label>
-        <input
-          id="contest-title"
-          type="text"
-          placeholder="Example: WOW! Women on Writing Creative Nonfiction Contest"
-        />
-      </div>
-
-      <div class="field">
-        <label for="deadline-label-input">Deadline label (what humans see)</label>
-        <input
-          id="deadline-label-input"
-          type="text"
-          placeholder="Example: 11:59 p.m. ET — January 31, 2026"
-        />
-        <small>This becomes the text inside the pink countdown card.</small>
-      </div>
-
-      <div class="field">
-        <label for="deadline-date-input">Deadline date &amp; time</label>
-        <input
-          id="deadline-date-input"
-          type="datetime-local"
-        />
-        <small>
-          Used for <code>new Date("...")</code> in the countdown script (interpreted in the visitor’s local time).
-        </small>
-      </div>
-
-      <div class="field">
-        <label for="max-words-input">Max words</label>
-        <input
-          id="max-words-input"
-          type="number"
-          min="1"
-          step="1"
-          placeholder="1000"
-        />
-        <small>This updates the Max words pill, the live counter, and the remaining words line.</small>
-      </div>
-
-      <div class="row">
-        <button type="button" id="copy-btn">Copy HTML</button>
-        <button type="button" id="download-btn">Download HTML</button>
-        <span class="copy-status" id="copy-status"></span>
-      </div>
-
-      <p class="hint">
-        After downloading, rename if you like (e.g., <code>wow-cn-jan-2026.html</code>) and open it in a browser.
-      </p>
-    </section>
-
-    <!-- Right: Output -->
-    <section class="panel">
-      <h2>Generated template</h2>
-      <p class="subtitle">This is the full HTML you can save for your specific contest.</p>
-      <textarea id="output" readonly></textarea>
-    </section>
-  </div>
-
-  <!-- Base template (the actual contest page) with placeholders -->
-  <script type="text/plain" id="base-template">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>{{TITLE}}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&display=swap');
-
-    :root {
-      --bg: #0f172a;
-      --card-bg: #ffffff;
-      --accent: #ec4899;
-      --accent-soft: rgba(236, 72, 153, 0.08);
-      --accent-strong: #db2777;
-      --text-main: #111827;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --textarea-bg: #f9fafb;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b, #020617 55%);
-      color: var(--text-main);
-    }
-
-    .app-shell {
+    input[type="text"],
+    input[type="number"],
+    textarea {
       width: 100%;
-      max-width: 960px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
-      padding: 24px 24px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 7px 9px;
+      font-size: 0.86rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #f9fafb;
+      outline: none;
     }
 
-    .app-header {
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: #f472b6;
+      box-shadow: 0 0 0 1px rgba(244, 114, 182, 0.4);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    input[type="number"] {
+      max-width: 120px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.4;
+    }
+
+    .small-help {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 3px;
+    }
+
+    .output-wrap {
+      margin-top: 14px;
+    }
+
+    .output-label {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .output-label span {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    button {
+      border-radius: 999px;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #f97316, #facc15);
+      color: #111827;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #052e16;
+    }
+
+    .copy-status {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .output-textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 7px 9px;
+      font-size: 0.8rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(15, 23, 42, 0.9);
+      color: #f9fafb;
+      min-height: 200px;
+      resize: vertical;
+      white-space: pre;
+    }
+
+    .note {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .right-column {
+      border-radius: 14px;
+      background: radial-gradient(circle at top right, #4b5563 0, #020617 45%);
+      padding: 16px 16px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .preview-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .preview-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .preview-inner {
+      background: #0b1120;
+      padding: 16px 12px 18px;
+    }
+
+    .title-block {
       padding-bottom: 12px;
     }
 
     .title-block h1 {
       font-family: "Oswald", sans-serif;
       font-size: 1.6rem;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
+      color: #e5e7eb;
+      margin: 0 0 4px;
+    }
+
+    .title-subline {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      max-width: 480px;
       margin: 0;
     }
 
-    .title-block p {
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      max-width: 32rem;
+    .preview-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .meta-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
     }
 
     .meta-row {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     .meta-pill {
       border-radius: 999px;
-      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.55);
       padding: 4px 10px;
       display: inline-flex;
-      align-items: center;
+      align-items: baseline;
       gap: 6px;
-      background: #f9fafb;
+      font-size: 0.75rem;
+      color: #e5e7eb;
+    }
+
+    .meta-pill span {
+      display: inline-block;
     }
 
     .meta-label {
-      font-family: "Oswald", sans-serif;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      font-size: 0.68rem;
       color: #9ca3af;
     }
 
-    .countdown-card {
-      min-width: 220px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: radial-gradient(circle at top, #fb7185, #db2777 65%);
-      color: #fdf2f8;
-      text-align: right;
-      position: relative;
-      overflow: hidden;
+    .meta-value {
+      font-weight: 600;
     }
 
-    .countdown-card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle at top, rgba(255,255,255,0.18), transparent 60%);
-      opacity: 0.35;
-      pointer-events: none;
+    .pink-card {
+      width: 260px;
+      max-width: 100%;
+      border-radius: 18px;
+      padding: 10px 12px 12px;
+      background: linear-gradient(135deg, #fb7185, #e11d48, #7e22ce);
+      box-shadow: 0 12px 30px rgba(148, 27, 79, 0.55);
+      color: #fee2e2;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .countdown-label {
-      position: relative;
-      font-family: "Oswald", sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
+    .pink-header {
+      font-size: 0.68rem;
       text-transform: uppercase;
-      opacity: 0.85;
-    }
-
-    .countdown-deadline {
-      position: relative;
-      font-size: 0.85rem;
-      margin-top: 2px;
+      letter-spacing: 0.12em;
+      font-weight: 700;
       opacity: 0.9;
     }
 
-    #countdown {
-      position: relative;
-      margin-top: 4px;
-      font-family: "Oswald", sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.12em;
+    .deadline-label-preview {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
 
-    .countdown-note {
-      position: relative;
+    .countdown-preview {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      border-top: 1px solid rgba(254, 202, 202, 0.45);
+      border-bottom: 1px solid rgba(254, 202, 202, 0.45);
       margin-top: 4px;
-      font-size: 0.65rem;
+    }
+
+    .card-footer-text {
+      font-size: 0.7rem;
       opacity: 0.85;
     }
 
     .writing-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 4px;
+      margin-top: 14px;
+      background: radial-gradient(circle at top left, #020617, #020617 35%, #020617);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      overflow: hidden;
     }
 
-    .section-label {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
+    .writing-header {
+      padding: 10px 13px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
     }
 
-    .section-label span.title {
-      font-family: "Oswald", sans-serif;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .section-label span.small {
+    .writing-title {
       font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 260px;
-      height: 55vh;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--textarea-bg);
-      font: 400 15px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text-main);
-      resize: vertical;
-      outline: none;
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease,
-        background-color 0.15s ease;
-    }
-
-    textarea:focus {
-      border-color: var(--accent-strong);
-      box-shadow: 0 0 0 1px rgba(219, 39, 119, 0.2),
-                  0 10px 25px rgba(15, 23, 42, 0.18);
-      background: #ffffff;
-    }
-
-    textarea::placeholder {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
       color: #9ca3af;
+      margin: 0 0 2px;
+    }
+
+    .writing-sub {
+      font-size: 0.76rem;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .writing-body {
+      padding: 10px 13px 12px;
+    }
+
+    .preview-textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.95), #020617);
+      color: #e5e7eb;
+      font-size: 0.84rem;
+      padding: 8px 10px;
+      min-height: 170px;
+      resize: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .preview-textarea::placeholder {
+      color: #4b5563;
+      font-style: italic;
     }
 
     .word-row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      padding: 6px 4px 0;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #9ca3af;
     }
 
-    .word-count {
-      font-family: "Oswald", sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.78rem;
+    .word-count-number {
+      font-weight: 600;
+      color: #e5e7eb;
     }
 
     .word-progress {
       flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      max-width: 260px;
-    }
-
-    .progress-track {
-      flex: 1;
-      height: 4px;
+      height: 5px;
       border-radius: 999px;
-      background: var(--accent-soft);
+      background: rgba(31, 41, 55, 0.9);
       overflow: hidden;
+      margin: 0 10px;
     }
 
-    .progress-bar {
+    .word-progress-inner {
       height: 100%;
       width: 0%;
-      border-radius: inherit;
-      background: var(--accent);
+      background: linear-gradient(90deg, #f9a8d4, #fb7185);
       transition: width 0.2s ease-out;
     }
 
     .word-remaining {
-      font-size: 0.75rem;
       white-space: nowrap;
     }
 
-    .footer-note {
-      margin-top: 6px;
+    .footnote {
+      margin-top: 8px;
       font-size: 0.7rem;
-      color: var(--text-muted);
-      text-align: right;
+      color: #6b7280;
     }
 
-    @media (max-width: 720px) {
-      body { padding: 12px; }
-      .app-shell {
-        padding: 16px 14px 12px;
-        border-radius: 16px;
-      }
-      .app-header { gap: 12px; }
-      .title-block h1 { font-size: 1.3rem; }
-      .countdown-card { width: 100%; text-align: left; }
-      #countdown { font-size: 1.25rem; }
-      textarea { height: 55vh; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 1px 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .small {
+      font-size: 0.7rem;
+      color: #6b7280;
     }
   </style>
 </head>
 <body>
-  <main class="app-shell">
-    <header class="app-header">
-      <div class="title-block">
-        <h1>{{TITLE}}</h1>
-        <p>Use this space to draft your entry, track your words, and race the clock to the deadline.</p>
+  <div class="page">
+    <div class="left-column">
+      <h2>Build your deadline template</h2>
+      <p class="hint">
+        Fill in your contest details on the left. The preview and HTML template update automatically.
+      </p>
 
+      <div class="field-group">
+        <label for="contest-title">Contest or project title</label>
+        <input
+          id="contest-title"
+          type="text"
+          placeholder="WOW! Women on Writing — Winter 2026"
+        />
+        <div class="small-help">
+          This appears at the top of the page.
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="deadline-label-input">Deadline label (what humans see)</label>
+        <input
+          id="deadline-label-input"
+          type="text"
+          placeholder="11:59 p.m. ET — January 31, 2026"
+        />
+        <div class="small-help">
+          This is just text. Use any style you like (24-hour, time zone, etc.).
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="deadline-date-input">
+          Deadline date &amp; time <small>(24-hour, ET, e.g. 2025-11-21 23:59)</small>
+        </label>
+        <input
+          id="deadline-date-input"
+          type="text"
+          placeholder="2025-11-21 23:59"
+        />
+        <div class="small-help">
+          Used for the countdown. Format: <code>YYYY-MM-DD HH:MM</code> in 24-hour Eastern Time.
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="max-words-input">Maximum word count</label>
+        <input
+          id="max-words-input"
+          type="number"
+          min="1"
+          max="50000"
+          value="3000"
+        />
+        <div class="small-help">
+          This controls the word counter and progress bar.
+        </div>
+      </div>
+
+      <div class="output-wrap">
+        <div class="output-label">
+          <span>Generated HTML template</span>
+          <div class="output-actions">
+            <button class="copy-btn" id="copy-btn">Copy</button>
+            <button class="download-btn" id="download-btn">Download</button>
+          </div>
+          <div class="copy-status" id="copy-status"></div>
+        </div>
+        <textarea
+          id="output"
+          class="output-textarea"
+          spellcheck="false"
+        ></textarea>
+        <div class="note">
+          Paste into a blank <code>.html</code> file or upload it to your site.
+          After downloading, rename if you like (e.g., <code>wow-cn-jan-2026.html</code>) and open it in your browser.
+        </div>
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="preview-label">Live preview</div>
+      <div class="preview-frame">
+        <div class="preview-inner">
+          <div class="title-block">
+            <h1 id="preview-title">WRITING CONTEST</h1>
+            <p class="title-subline">
+              Use this space to draft your entry, track your words, and race the clock to the deadline.
+            </p>
+          </div>
+
+          <div class="preview-top-row">
+            <div class="meta-block">
+              <div class="meta-row">
+                <div class="meta-pill">
+                  <span class="meta-label">Max words</span>
+                  <span class="meta-value"><span id="preview-max-words">3,000</span></span>
+                </div>
+                <div class="meta-pill">
+                  <span class="meta-label">Goal</span>
+                  <span class="meta-value">Done by the deadline — no excuses.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pink-card">
+              <div class="pink-header">Time remaining until</div>
+              <div class="deadline-label-preview" id="preview-deadline-label">
+                11:59 p.m. ET — January 31, 2026
+              </div>
+              <div class="countdown-preview">Loading…</div>
+              <div class="card-footer-text">
+                This preview just shows layout — the real countdown runs in your final template.
+              </div>
+            </div>
+          </div>
+
+          <div class="writing-section">
+            <div class="writing-header">
+              <p class="writing-title">Draft space</p>
+              <p class="writing-sub">Start writing your story here…</p>
+            </div>
+            <div class="writing-body">
+              <textarea
+                class="preview-textarea"
+                placeholder="The real template includes auto-save, word counting, and the countdown timer."
+              ></textarea>
+
+              <div class="word-row">
+                <div>
+                  Words:
+                  <span class="word-count-number">0</span>
+                  /
+                  <span class="word-count-number" id="preview-max-words-2">3,000</span>
+                </div>
+                <div class="word-progress">
+                  <div class="word-progress-inner" style="width: 0%;"></div>
+                </div>
+                <div class="word-remaining">
+                  <span id="preview-remaining">3,000 words remaining</span>
+                </div>
+              </div>
+              <div class="footnote">
+                Tip: If you're stuck, write the messy version. Future-you can fix sentences — not blank space.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="small">
+        Note: The preview's pink card uses placeholder text. Your downloaded template includes the live countdown logic.
+      </p>
+    </div>
+  </div>
+
+  <!-- Base template the builder uses -->
+  <script type="text/plain" id="base-template">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{TITLE}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827, #020617 45%, #000000);
+      color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(15, 23, 42, 0.97);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      padding: 24px 24px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    @media (max-width: 960px) {
+      .page {
+        padding: 20px 14px 22px;
+      }
+    }
+
+    .title-block {
+      padding-bottom: 12px;
+    }
+
+    .title-block h1 {
+      font-family: "Oswald", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      margin: 0 0 4px;
+    }
+
+    .title-subline {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      max-width: 520px;
+      margin: 0;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .meta-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .meta-pill {
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #e5e7eb;
+    }
+
+    .meta-pill span {
+      display: inline-block;
+    }
+
+    .meta-label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      font-size: 0.68rem;
+      color: #9ca3af;
+    }
+
+    .meta-value {
+      font-weight: 600;
+    }
+
+    .pink-card {
+      width: 260px;
+      max-width: 100%;
+      border-radius: 18px;
+      padding: 10px 12px 12px;
+      background: linear-gradient(135deg, #fb7185, #e11d48, #7e22ce);
+      box-shadow: 0 12px 30px rgba(148, 27, 79, 0.55);
+      color: #fee2e2;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pink-header {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .deadline-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .countdown {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      border-top: 1px solid rgba(254, 202, 202, 0.45);
+      border-bottom: 1px solid rgba(254, 202, 202, 0.45);
+      margin-top: 4px;
+    }
+
+    .card-footer-text {
+      font-size: 0.7rem;
+      opacity: 0.85;
+    }
+
+    .writing-section {
+      margin-top: 14px;
+      background: radial-gradient(circle at top left, #020617, #020617 35%, #020617);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      overflow: hidden;
+    }
+
+    .writing-header {
+      padding: 10px 13px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .writing-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #9ca3af;
+      margin: 0 0 2px;
+    }
+
+    .writing-sub {
+      font-size: 0.76rem;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .writing-body {
+      padding: 10px 13px 12px;
+    }
+
+    .draft-area {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.95), #020617);
+      color: #e5e7eb;
+      font-size: 0.84rem;
+      padding: 8px 10px;
+      min-height: 170px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .draft-area::placeholder {
+      color: #4b5563;
+      font-style: italic;
+    }
+
+    .word-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .word-count-number {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .word-progress {
+      flex: 1;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 0.9);
+      overflow: hidden;
+      margin: 0 10px;
+    }
+
+    .word-progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f9a8d4, #fb7185);
+      transition: width 0.2s ease-out;
+    }
+
+    .word-remaining {
+      white-space: nowrap;
+    }
+
+    .footnote {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 1px 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .small {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="title-block">
+      <h1>{{TITLE}}</h1>
+      <p class="title-subline">
+        Use this space to draft your entry, track your words, and race the clock to the deadline.
+      </p>
+    </div>
+
+    <div class="top-row">
+      <div class="meta-block">
         <div class="meta-row">
           <div class="meta-pill">
             <span class="meta-label">Max words</span>
-            <span>{{MAX_WORDS_LABEL}}</span>
+            <span class="meta-value">{{MAX_WORDS_LABEL}}</span>
           </div>
           <div class="meta-pill">
             <span class="meta-label">Goal</span>
-            <span>Done by the deadline — no excuses.</span>
+            <span class="meta-value">Done by the deadline — no excuses.</span>
           </div>
         </div>
       </div>
 
-      <div class="countdown-card">
-        <div class="countdown-label">Time remaining until</div>
-        <div class="countdown-deadline" id="deadline-label">{{DEADLINE_DISPLAY}}</div>
-        <div id="countdown">Loading…</div>
-        <div class="countdown-note">
-          Keep typing. You can edit later — you can’t move the deadline.
+      <div class="pink-card">
+        <div class="pink-header">Time remaining until</div>
+        <div class="deadline-label" id="deadline-label"></div>
+        <div class="countdown" id="countdown">Loading…</div>
+        <div class="card-footer-text">
+          Keep typing. You can edit later — you can't move the deadline.
         </div>
       </div>
-    </header>
+    </div>
 
-    <section class="writing-section">
-      <div class="section-label">
-        <span class="title">Draft space</span>
-        <span class="small">Your work auto-saves in this browser.</span>
-      </div>
-
-      <textarea
-        id="essay"
-        data-max-words="{{MAX_WORDS}}"
-        placeholder="Start writing your story here…"
-      ></textarea>
-
-      <div class="word-row">
-        <div id="essay-count" class="word-count">Words: 0 / {{MAX_WORDS_LABEL}}</div>
-
-        <div class="word-progress">
-          <div class="progress-track">
-            <div class="progress-bar" id="progress-bar"></div>
-          </div>
-          <div id="word-remaining" class="word-remaining">
-            {{MAX_WORDS_LABEL}} words remaining
-          </div>
+    <div class="writing-section">
+      <div class="writing-header">
+        <div>
+          <p class="writing-title">Draft space</p>
+          <p class="writing-sub">Your work auto-saves in this browser.</p>
         </div>
       </div>
+      <div class="writing-body">
+        <textarea
+          class="draft-area"
+          id="essay"
+          data-max-words="{{MAX_WORDS}}"
+          placeholder="Start writing your story here…"
+        ></textarea>
 
-      <div class="footer-note">
-        Tip: If you’re stuck, write the messy version. Future-you can fix sentences — not blank space.
+        <div class="word-row">
+          <div>
+            Words:
+            <span class="word-count-number" id="essay-count">0</span>
+            /
+            <span class="word-count-number">{{MAX_WORDS_LABEL}}</span>
+          </div>
+          <div class="word-progress">
+            <div class="word-progress-inner" id="progress-bar" style="width: 0%;"></div>
+          </div>
+          <div class="word-remaining">
+            <span id="word-remaining">{{MAX_WORDS_LABEL}} words remaining</span>
+          </div>
+        </div>
+        <div class="footnote">
+          Tip: If you're stuck, write the messy version. Future-you can fix sentences — not blank space.
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <script>
     const textarea = document.getElementById('essay');
@@ -546,7 +955,7 @@
     const maxWords = parseInt(textarea.getAttribute('data-max-words'), 10);
 
     function getWordArray(text) {
-      return text.trim().split(/\\s+/).filter(Boolean);
+      return text.trim().split(/\s+/).filter(Boolean);
     }
 
     function updateWordStats() {
@@ -555,30 +964,32 @@
 
       if (!Number.isFinite(maxWords) || maxWords <= 0) return;
 
-      if (wordCount > maxWords) {
-        words = words.slice(0, maxWords);
-        textarea.value = words.join(' ');
-        wordCount = maxWords;
+      countDiv.textContent = wordCount.toLocaleString();
+
+      let clamped = Math.max(0, Math.min(wordCount, maxWords));
+      let ratio = clamped / maxWords;
+      let percentage = Math.round(ratio * 100);
+
+      progressBar.style.width = percentage + '%';
+
+      let remaining = maxWords - wordCount;
+      if (remaining < 0) {
+        remainingEl.textContent = `Over by ${Math.abs(remaining).toLocaleString()} words`;
+      } else {
+        remainingEl.textContent = `${remaining.toLocaleString()} words remaining`;
       }
-
-      countDiv.textContent = \`Words: \${wordCount} / \${maxWords.toLocaleString()}\`;
-
-      const pct = Math.min(100, (wordCount / maxWords) * 100);
-      progressBar.style.width = pct + '%';
-
-      const remaining = Math.max(0, maxWords - wordCount);
-      remainingEl.textContent =
-        \`\${remaining.toLocaleString()} word\${remaining === 1 ? '' : 's'} remaining\`;
-
-      localStorage.setItem('contest-essay', textarea.value);
     }
 
-    const savedText = localStorage.getItem('contest-essay');
+    const STORAGE_KEY = 'deadline-template-draft-v1';
+    const savedText = localStorage.getItem(STORAGE_KEY);
     if (savedText) {
       textarea.value = savedText;
     }
     updateWordStats();
-    textarea.addEventListener('input', updateWordStats);
+    textarea.addEventListener('input', () => {
+      updateWordStats();
+      localStorage.setItem(STORAGE_KEY, textarea.value);
+    });
 
     // --- Countdown ---
     const deadlineDisplay = "{{DEADLINE_DISPLAY}}";
@@ -609,10 +1020,10 @@
       const seconds = totalSeconds % 60;
 
       const parts = [];
-      if (days > 0) parts.push(\`\${days}d\`);
-      if (hours > 0 || days > 0) parts.push(\`\${hours}h\`);
-      if (minutes > 0 || hours > 0 || days > 0) parts.push(\`\${minutes}m\`);
-      parts.push(\`\${seconds}s\`);
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
 
       countdownEl.textContent = parts.join(' ');
     }
@@ -636,7 +1047,11 @@
     const copyStatus = document.getElementById('copy-status');
 
     function escapeForDoubleQuotedJsString(str) {
-      return String(str).replace(/"/g, '\\"');
+      // Escape backslashes, double quotes, and newlines for safe JS string embedding
+      return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\r?\n/g, ' ');
     }
 
     function updateOutput() {
@@ -646,10 +1061,31 @@
       const maxWordsNum = parseInt(maxWordsRaw, 10) || 1000;
       const maxWordsLabel = maxWordsNum.toLocaleString();
 
-      let targetDateValue = deadlineDateInput.value.trim();
-      // leave empty string if no date set; user can adjust by hand
+      let rawTarget = deadlineDateInput.value.trim();
+      let targetDateForTemplate = "";
+
+      if (rawTarget) {
+        // Accept "YYYY-MM-DD HH:MM" or "YYYY-MM-DDTHH:MM" in 24-hour format (ET)
+        const m = rawTarget.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/);
+        if (m) {
+          const year = m[1];
+          const month = m[2];
+          const day = m[3];
+          const hour = m[4];
+          const minute = m[5];
+          const monthNum = parseInt(month, 10);
+          // Simple DST heuristic: Mar–Oct as EDT (-04:00), otherwise EST (-05:00)
+          const isDSTMonth = monthNum >= 3 && monthNum <= 10;
+          const offset = isDSTMonth ? "-04:00" : "-05:00";
+          targetDateForTemplate = `${year}-${month}-${day}T${hour}:${minute}:00${offset}`;
+        } else {
+          // If pattern doesn't match, leave as-is so user can hand-edit in the output
+          targetDateForTemplate = rawTarget;
+        }
+      }
+
       const safeDeadlineDisplay = escapeForDoubleQuotedJsString(deadlineDisplayRaw);
-      const safeTargetDate = escapeForDoubleQuotedJsString(targetDateValue);
+      const safeTargetDate = escapeForDoubleQuotedJsString(targetDateForTemplate);
 
       let html = baseTemplate
         .replace(/{{TITLE}}/g, title)
@@ -659,6 +1095,13 @@
         .replace(/{{MAX_WORDS_LABEL}}/g, maxWordsLabel);
 
       output.value = html.trim();
+
+      // Update preview bits on the right
+      document.getElementById('preview-title').textContent = title.toUpperCase();
+      document.getElementById('preview-deadline-label').textContent = deadlineDisplayRaw || '11:59 p.m. ET — January 31, 2026';
+      document.getElementById('preview-max-words').textContent = maxWordsLabel;
+      document.getElementById('preview-max-words-2').textContent = maxWordsLabel;
+      document.getElementById('preview-remaining').textContent = `${maxWordsLabel} words remaining`;
     }
 
     [titleInput, deadlineLabelInput, deadlineDateInput, maxWordsInput].forEach(el => {
@@ -685,11 +1128,11 @@
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
-
-      const safeTitle = (titleInput.value.trim() || 'contest')
-        .replace(/[^a-z0-9]+/gi, '-')
-        .replace(/(^-|-$)/g, '')
-        .toLowerCase() || 'contest';
+      const safeTitle =
+        (titleInput.value.trim() || 'contest')
+          .replace(/[^a-z0-9]+/gi, '-')
+          .replace(/(^-|-$)/g, '')
+          .toLowerCase() || 'contest';
 
       a.href = url;
       a.download = safeTitle + '-deadline.html';
