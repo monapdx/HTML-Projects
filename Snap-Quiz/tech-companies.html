@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tech Companies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+    body { font-family: "Oswald", serif; margin: 20px; text-align: center; }
+    #correct-words { margin-top: 20px; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+    #correct-words li { list-style-type: none; margin: 5px; padding: 10px; background-color: #a8e6ce; border-radius: 5px; }
+    #correct-words li:hover { border: 1px outset #a8e6ce; background-color: #f0fff0; }
+    #counter { margin-top: 20px; font-size: 1.2em; }
+    h1 { font-weight: 800; font-style: normal; }
+    input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; }
+    input:focus { outline: none; border-color: blue; box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
+    button.answer { margin-top: 10px; width: 100%; background: #007bff; color: #fff; font-size: 16px; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s ease; }
+    button.answer:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Tech Companies</h1>
+  <p>How many can you think of?</p>
+  <br><br>
+  <input type="text" id="word-input" placeholder="Type your guess..." autofocus>
+  <button onclick="checkWord()" class="answer">Submit</button>
+  <div id="counter">Correct Answers: 0 / 195</div>
+  <div id="progress-container">
+    <canvas id="progress-canvas" width="150" height="150"></canvas>
+  </div>
+  <ul id="correct-words"></ul>
+  <script>
+    const wordList = ["Activision Blizzard","ATVI","Adobe","ADBE","Adyen","ADYYF","Airbnb","ABNB","Alibaba","BABA","Align Technology","ALGN","Alphabet (Google)","GOOG","Amazon","AMZN","AMD","Analog Devices","ADI","Apple","AAPL","Applied Materials","AMAT","Arista Networks","ANET","ASML","Atlassian","TEAM","Autodesk","ADSK","Automatic Data Processing","ADP","Baidu","BIDU","Booking.com","BKNG","Broadcom","AVGO","Cadence Design Systems","CDNS","Cisco","CSCO","Cloudflare","NET","Coinbase","COIN","Constellation Software","CSU.TO","Coupang","CPNG","CrowdStrike","CRWD","Dassault Systèmes","DASTF","Datadog","DDOG","Dell","DELL","eBay","EBAY","Electronic Arts","EA","Equinix","EQIX","Fidelity National Information Services","FIS","Fiserv","FISV","Fortinet","FTNT","Foxconn","2317.TW","Global Payments","GPN","HP","HPQ","IBM","Infineon","IFX.DE","Intel","INTC","Intuit","INTU","IQVIA","IQV","Jingdong Mall","JD","Kakao","035720.KS","Keyence","KYCCF","Keysight","KEYS","KLA","KLAC","Lam Research","LRCX","Marvell Technology Group","MRVL","MediaTek","2454.TW","Meituan","MPNGF","MercadoLibre","MELI","Meta (Facebook)","FB","Microchip Technology","MCHP","Micron Technology","MU","Microsoft","MSFT","Murata Seisakusho","MRAAF","Naver","035420.KS","NetEase","NTES","Netflix","NFLX","Nintendo","NTDOF","NVIDIA","NVDA","NXP Semiconductors","NXPI","Oracle","ORCL","Palo Alto Networks","PANW","PayPal","PYPL","Pinduoduo","PDD","QUALCOMM","QCOM","Roper Technologies","ROP","Salesforce","CRM","Samsung","005930.KS","SAP","Schneider Electric","SBGSF","ServiceNow","NOW","Shopify","SHOP","SK Hynix","000660.KS","Snap","SNAP","Snowflake","SNOW","Sony","SONY","Square","SQ","Synopsys","SNPS","TE Connectivity","TEL","Tencent","TCEHY","Tesla","TSLA","Texas Instruments","TXN","The Trade Desk","TTD","Tokyo Electron","TOELF","TSMC","TSM","Twilio","TWLO","Uber","UBER","Unity Software","Veeva Systems","VEEV","Vmware","VMW","Workday","WDAY","Xiaomi","XIACF","Xilinx","XLNX","Zoom","ZM","Zscaler","ZS"];
+    const normalizedAnswers = new Set(wordList.map(w => w.toLowerCase()));
+    const foundNormalized = new Set();
+    const foundDisplay = [];
+    const totalWords = wordList.length;
+    function updateCounter() {
+      const correctCount = foundDisplay.length;
+      document.getElementById('counter').textContent = 'Correct Answers: ' + correctCount + ' / ' + totalWords;
+      updateCanvas((correctCount / totalWords) * 100);
+    }
+    function checkWord() {
+      const inputEl = document.getElementById('word-input');
+      const guess = inputEl.value.trim();
+      const key = guess.toLowerCase();
+      if (key && normalizedAnswers.has(key) && !foundNormalized.has(key)) {
+        foundNormalized.add(key);
+        foundDisplay.push(guess);
+        const list = document.getElementById('correct-words');
+        const li = document.createElement('li');
+        li.textContent = guess;
+        list.appendChild(li);
+        updateCounter();
+      }
+      inputEl.value = '';
+      inputEl.focus();
+    }
+    document.getElementById('word-input').addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') { checkWord(); }
+    });
+    function updateCanvas(percentage) {
+      const canvas = document.getElementById('progress-canvas');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 60;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#f3f3f3';
+      ctx.fill();
+      const endAngle = (percentage / 100) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + endAngle);
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = '#4caf50';
+      ctx.stroke();
+      ctx.font = '18px Arial';
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(percentage) + '%', centerX, centerY);
+    }
+    updateCounter();
+  </script>
+</body>
+</html>

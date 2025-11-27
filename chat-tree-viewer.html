@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chat Archive Viewer — Flat View</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0c10;
+    --panel: #12151a;
+    --muted: #9aa4b2;
+    --text: #e6edf3;
+    --accent: #7aa2f7;
+    --border: #1f2430;
+    --green: #9ece6a;
+    --yellow: #e0af68;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    background: linear-gradient(180deg, #0b0c10, #0b0c10 200px, #0d0f14);
+    color: var(--text);
+  }
+  header {
+    position: sticky; top: 0; z-index: 3;
+    display: flex; gap: 12px; align-items: center; padding: 10px 14px;
+    background: rgba(13, 15, 20, 0.8); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 16px; margin: 0 8px 0 0; font-weight: 600; letter-spacing: .2px; }
+  .btn {
+    appearance: none; border: 1px solid var(--border); background: var(--panel);
+    padding: 8px 12px; border-radius: 10px; color: var(--text); cursor: pointer;
+  }
+  .btn:hover { border-color: #2a3140; }
+  .btn:active { transform: translateY(1px); }
+  .pill { font-size: 12px; color: var(--muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; }
+  #wrap { display: grid; grid-template-columns: 320px 1fr; height: calc(100% - 52px); }
+  #left, #right { overflow: auto; }
+  #left { border-right: 1px solid var(--border); background: #0d0f14; }
+  .pane-title { display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; position: sticky; top: 0; background:#0d0f14; z-index:2; border-bottom: 1px solid var(--border);}
+  .search { margin: 10px 12px; }
+  .search input {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text);
+  }
+  .list { padding: 6px 6px 80px; }
+  .chat {
+    display:flex; gap:10px; align-items:flex-start; padding: 10px; margin: 6px; border:1px solid var(--border); border-radius: 12px; background: #0f131a; cursor: pointer;
+  }
+  .chat:hover { border-color: #2a3140; background:#0f151f; }
+  .chat-title { font-weight: 600; font-size: 14px; line-height: 1.25; }
+  .chat-sub { font-size: 12px; color: var(--muted); }
+  .tag { border:1px solid var(--border); color: var(--muted); font-size: 11px; padding: 2px 6px; border-radius: 8px; }
+  #right { padding: 12px 18px; }
+  #empty {
+    margin: 18vh auto; max-width: 640px; text-align: center; color: var(--muted);
+  }
+  #drop {
+    margin-top: 16px; padding: 26px; border: 2px dashed #2a3140; border-radius: 16px; color: var(--muted); background: #0f131a;
+  }
+  /* FLAT CHAT VIEW */
+  .conv-header {
+    border: 1px solid var(--border); border-radius: 12px; background:#0f131a; padding: 12px 14px; margin-bottom: 12px;
+  }
+  .conv-title { font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .conv-meta { font-size: 12px; color: var(--muted); display:flex; gap:10px; flex-wrap:wrap; }
+  .toolbar { display:flex; gap: 10px; margin: 8px 0 14px; flex-wrap: wrap; }
+  .toolbar label { display:flex; align-items:center; gap:6px; border:1px solid var(--border); background:#0f131a; padding:6px 10px; border-radius:10px; font-size:13px; color: var(--muted); cursor:pointer; }
+  .messages {
+    display: grid; gap: 10px;
+  }
+  .msg {
+    border: 1px solid var(--border);
+    background: #121722;
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+  .msg-head {
+    display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 6px;
+  }
+  .role {
+    font-size: 12px; border:1px solid var(--border); border-radius: 999px; padding: 2px 8px; color: var(--muted);
+  }
+  .role.user { border-color: rgba(122,162,247,.35); color:#a7c0ff; }
+  .role.assistant { border-color: rgba(158,206,106,.35); color:#bce48e; }
+  .role.system { border-color: rgba(224,175,104,.35); color:#f0d39b; }
+  .msg-meta { font-size: 11px; color: var(--muted); }
+  .msg-body { white-space: pre-wrap; }
+  .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0f131a; border:1px solid var(--border); padding:1px 6px; border-radius:6px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Chat Archive Viewer</h1>
+  <label class="btn">
+    <input id="file" type="file" accept=".json,application/json" class="sr">
+    Load JSON…
+  </label>
+  <button class="btn" id="demoBtn" title="Load a tiny demo structure">Load Demo</button>
+  <span id="status" class="pill">No file loaded</span>
+</header>
+
+<div id="wrap">
+  <aside id="left">
+    <div class="pane-title">
+      <div>Conversations</div>
+      <div class="pill" id="count">0</div>
+    </div>
+    <div class="search">
+      <input id="q" type="search" placeholder="Filter by title… (Ctrl+/)">
+    </div>
+    <div class="list" id="list"></div>
+  </aside>
+
+  <main id="right">
+    <div id="empty">
+      <h2>Load your export JSON to browse chats by title</h2>
+      <div id="drop">Drop the file here or use <span class="kbd">Load JSON…</span></div>
+      <p class="pill" style="display:inline-block;margin-top:10px;">Flat chat view · no tree indentation</p>
+    </div>
+    <div id="viewer" hidden></div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const fileInput = document.querySelector('#file');
+  const statusEl  = document.querySelector('#status');
+  const listEl    = document.querySelector('#list');
+  const countEl   = document.querySelector('#count');
+  const qEl       = document.querySelector('#q');
+  const viewer    = document.querySelector('#viewer');
+  const empty     = document.querySelector('#empty');
+  const demoBtn   = document.querySelector('#demoBtn');
+  const dropZone  = document.querySelector('#drop');
+
+  let conversations = [];
+  let filtered = [];
+
+  const byTitle = (a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' });
+
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  function humanTime(ts) {
+    if (!ts && ts !== 0) return '';
+    try {
+      const d = new Date(ts * 1000);
+      return d.toLocaleString();
+    } catch { return ''; }
+  }
+
+  function countMessages(mapping) {
+    let n = 0;
+    for (const k in mapping) {
+      const m = mapping[k]?.message;
+      if (m && (m.content?.parts?.length || m.content?.text)) n++;
+    }
+    return n;
+  }
+
+  function normalizeData(json) {
+    if (Array.isArray(json)) return json;
+    if (json && Array.isArray(json.conversations)) return json.conversations;
+    if (json && typeof json === 'object') {
+      const arr = Object.values(json).filter(v => v && typeof v === 'object' && ('title' in v || 'mapping' in v));
+      if (arr.length) return arr;
+    }
+    throw new Error('Unrecognized JSON shape. Expect an array of conversation objects with "title" and "mapping".');
+  }
+
+  function renderList(items) {
+    listEl.innerHTML = '';
+    countEl.textContent = items.length;
+    items.forEach((c, idx) => {
+      const el = document.createElement('div');
+      el.className = 'chat';
+      el.dataset.idx = idx.toString();
+
+      const msgs = countMessages(c.mapping || {});
+      const when = humanTime(c.update_time || c.create_time);
+      el.innerHTML = `
+        <div style="flex:1 1 auto;">
+          <div class="chat-title">${escapeHtml(c.title || '(untitled)')}</div>
+          <div class="chat-sub">${when ? when + ' · ' : ''}${msgs} message${msgs === 1 ? '' : 's'}</div>
+        </div>
+        <div class="tag">#${idx+1}</div>
+      `;
+      el.addEventListener('click', () => openConversation(c));
+      listEl.appendChild(el);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+  }
+
+  function nodeTime(n) {
+    return n?.message?.create_time ?? n?.create_time ?? 0;
+  }
+
+  function flattenMessages(mapping) {
+    const arr = [];
+    let i = 0;
+    for (const k in mapping) {
+      const n = mapping[k];
+      if (n?.message) {
+        arr.push({ node: n, index: i++ });
+      }
+    }
+    // Sort by timestamp if present, then by discovery index (stable-ish)
+    arr.sort((a,b) => {
+      const t1 = nodeTime(a.node);
+      const t2 = nodeTime(b.node);
+      if (t1 !== t2) return t1 - t2;
+      return a.index - b.index;
+    });
+    return arr.map(x => x.node);
+  }
+
+  function openConversation(conv) {
+    empty.hidden = true;
+    viewer.hidden = false;
+    viewer.innerHTML = '';
+
+    const mapping = conv.mapping || {};
+    const msgs = flattenMessages(mapping);
+
+    const header = document.createElement('div');
+    header.className = 'conv-header';
+    header.innerHTML = `
+      <div class="conv-title">${escapeHtml(conv.title || '(untitled)')}</div>
+      <div class="conv-meta">
+        <span>${humanTime(conv.update_time || conv.create_time)}</span>
+        <span>messages: ${msgs.length}</span>
+        <span>nodes: ${Object.keys(mapping).length}</span>
+      </div>
+      <div class="toolbar">
+        <label><input type="checkbox" id="toggleSystem" checked> Show system</label>
+        <label><input type="checkbox" id="compactMode"> Compact spacing</label>
+      </div>
+    `;
+    const list = document.createElement('div');
+    list.className = 'messages';
+    viewer.append(header, list);
+
+    function renderMessages() {
+      const showSystem = header.querySelector('#toggleSystem').checked;
+      const compact = header.querySelector('#compactMode').checked;
+      list.style.gap = compact ? '6px' : '10px';
+      list.innerHTML = '';
+
+      msgs.forEach(n => {
+        const role = n.message?.author?.role || 'system';
+        if (!showSystem && role === 'system') return;
+
+        const parts = n.message?.content?.parts || [];
+        const text = Array.isArray(parts) ? parts.join('\n') : (n.message?.content?.text || '');
+        const when = humanTime(nodeTime(n));
+
+        const el = document.createElement('div');
+        el.className = 'msg';
+        el.innerHTML = `
+          <div class="msg-head">
+            <div class="role ${role}">${role}</div>
+            <div class="msg-meta">${when || ''}</div>
+          </div>
+          <div class="msg-body">${escapeHtml(text)}</div>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    renderMessages();
+    header.querySelector('#toggleSystem').addEventListener('change', renderMessages);
+    header.querySelector('#compactMode').addEventListener('change', renderMessages);
+  }
+
+  function applyFilter() {
+    const q = qEl.value.trim().toLowerCase();
+    if (!q) {
+      filtered = [...conversations].sort(byTitle);
+    } else {
+      filtered = conversations.filter(c => (c.title || '').toLowerCase().includes(q)).sort(byTitle);
+    }
+    renderList(filtered);
+  }
+
+  async function loadFromFile(file) {
+    setStatus(`Reading ${file.name}…`);
+    const text = await file.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+      conversations = normalizeData(data);
+    } catch (e) {
+      setStatus('Invalid JSON: ' + e.message);
+      throw e;
+    }
+    setStatus(`Loaded ${conversations.length} conversation${conversations.length===1?'':'s'}`);
+    filtered = [...conversations].sort(byTitle);
+    renderList(filtered);
+    viewer.hidden = true; empty.hidden = false;
+  }
+
+  // UI wiring
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files?.[0];
+    if (f) loadFromFile(f);
+  });
+
+  qEl.addEventListener('input', applyFilter);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '/' || (e.ctrlKey && e.key.toLowerCase() === 'f')) {
+      if (document.activeElement !== qEl) {
+        e.preventDefault();
+        qEl.focus();
+        qEl.select();
+      }
+    }
+  });
+
+  // Drag & drop
+  ;['dragenter','dragover'].forEach(evt => {
+    document.addEventListener(evt, (e)=> { e.preventDefault(); e.stopPropagation(); });
+  });
+  ;['dragleave','drop'].forEach(evt => {
+    document.addEventListener(evt, (e)=> { e.preventDefault(); e.stopPropagation(); });
+  });
+  document.addEventListener('drop', (e) => {
+    const f = e.dataTransfer?.files?.[0];
+    if (f) loadFromFile(f);
+  });
+
+  // Demo data (tiny)
+  demoBtn.addEventListener('click', () => {
+    const demo = [
+      {
+        title: "Vivid Dream Reflection",
+        create_time: 1733136833.21,
+        update_time: 1733136955.06,
+        mapping: {
+          "root": { id: "root", parent: null, children: ["n1"] },
+          "n1": { id: "n1", parent: "root", children: ["n2"], message: { id: "m1", create_time: 1733136835, author: { role:"user" }, content: { content_type: "text", parts: ["I dreamt about Rick."] } } },
+          "n2": { id: "n2", parent: "n1", children: [], message: { id: "m2", create_time: 1733136840, author: { role:"assistant" }, content: { content_type: "text", parts: ["How did it feel?"] } } }
+        }
+      },
+      {
+        title: "IQ Estimation Discussion",
+        create_time: 1733136620.33,
+        update_time: 1733136651.94,
+        mapping: {
+          "root": { id: "root", parent: null, children: ["a"] },
+          "a": { id: "a", parent: "root", children: [], message: { id: "m3", create_time: 1733136630, author: { role:"user" }, content: { content_type: "text", parts: ["What do you estimate my IQ is?"] } } }
+        }
+      }
+    ];
+    conversations = demo;
+    filtered = [...conversations].sort(byTitle);
+    renderList(filtered);
+    setStatus('Demo loaded');
+    viewer.hidden = true; empty.hidden = false;
+  });
+
+})();
+</script>
+</body>
+</html>
